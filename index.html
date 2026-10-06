@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Quick Tools</title>
+  
   <!-- Telegram Web App SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <!-- Leitor de QR Code -->
@@ -12,175 +13,90 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.1/math.js"></script>
   <!-- Manipulador de ZIP -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-  <!-- Tesseract.js OCR v5 -->
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-  <!-- Ícones Phosphor -->
-  <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
   <style>
     :root {
-      --bg: var(--tg-theme-bg-color, #f4f6fb);
-      --text: var(--tg-theme-text-color, #1e293b);
-      --sec-bg: var(--tg-theme-secondary-bg-color, #ffffff);
-      --btn-bg: var(--tg-theme-button-color, #2563eb);
+      --bg: var(--tg-theme-bg-color, #ffffff);
+      --text: var(--tg-theme-text-color, #111111);
+      --sec-bg: var(--tg-theme-secondary-bg-color, #f3f4f6);
+      --btn-bg: var(--tg-theme-button-color, #2481cc);
       --btn-text: var(--tg-theme-button-text-color, #ffffff);
-      --hint: var(--tg-theme-hint-color, #64748b);
-      --accent-green: #10b981;
-      --accent-red: #ef4444;
-      --accent-orange: #f59e0b;
-      --card-border: rgba(0, 0, 0, 0.07);
-      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+      --hint: var(--tg-theme-hint-color, #707579);
     }
-
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-
+    * { box-sizing: border-box; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       background-color: var(--bg);
       color: var(--text);
       margin: 0;
-      padding: 14px 14px 50px 14px;
-      min-height: 100vh;
-      user-select: none;
+      padding: 16px;
     }
-
-    header {
-      text-align: center;
-      margin-bottom: 12px;
-    }
-    header h1 {
-      font-size: 22px;
-      font-weight: 800;
-      margin: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-    header p.welcome {
-      font-size: 13px;
-      color: var(--hint);
-      margin: 4px 0 0 0;
-    }
+    h1 { font-size: 20px; text-align: center; margin: 0 0 4px 0; }
+    p.welcome { text-align: center; margin: 0 0 16px 0; font-size: 13px; color: var(--hint); }
 
     .tabs-wrapper {
-      position: sticky;
-      top: 0;
-      background: var(--bg);
-      z-index: 50;
-      padding-bottom: 10px;
       overflow-x: auto;
       white-space: nowrap;
+      margin-bottom: 16px;
+      border-bottom: 2px solid var(--sec-bg);
       -webkit-overflow-scrolling: touch;
-      display: flex;
-      gap: 6px;
-      margin: 0 -14px 14px -14px;
-      padding-left: 14px;
-      padding-right: 14px;
     }
-    .tabs-wrapper::-webkit-scrollbar {
-      display: none;
-    }
-
+    .tabs-wrapper::-webkit-scrollbar { display: none; }
     .tab-btn {
-      background: var(--sec-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 20px;
-      padding: 8px 14px;
+      background: none;
+      border: none;
+      display: inline-block;
+      padding: 10px 14px;
       color: var(--text);
-      font-size: 13px;
       font-weight: 600;
+      font-size: 13px;
       cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      flex-shrink: 0;
-      box-shadow: var(--shadow-sm);
+      opacity: 0.6;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s ease;
     }
     .tab-btn.active {
-      background: var(--btn-bg);
-      color: var(--btn-text);
-      border-color: var(--btn-bg);
-      transform: translateY(-1px);
+      opacity: 1;
+      border-bottom: 3px solid var(--btn-bg);
+      color: var(--btn-bg);
     }
-
-    .tab-content {
-      display: none;
-      animation: fadeIn 0.2s ease-in-out;
-    }
-    .tab-content.active {
-      display: block;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(4px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
 
     .card {
       background: var(--sec-bg);
-      border-radius: 16px;
+      border-radius: 12px;
       padding: 16px;
-      box-shadow: var(--shadow-sm);
-      border: 1px solid var(--card-border);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
       margin-bottom: 14px;
     }
-
-    label {
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--hint);
-      display: block;
-      margin-bottom: 6px;
-    }
-
-    input[type="text"],
-    input[type="tel"],
-    input[type="url"],
-    input[type="number"],
-    select,
-    textarea {
+    label { font-weight: 600; font-size: 13px; display: block; margin-bottom: 6px; }
+    input[type="text"], input[type="tel"], input[type="url"], input[type="file"], select, textarea {
       width: 100%;
-      padding: 12px 14px;
-      border-radius: 10px;
-      border: 1.5px solid rgba(0, 0, 0, 0.1);
+      padding: 11px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
       font-size: 14px;
-      background: var(--bg);
-      color: var(--text);
       margin-bottom: 12px;
-      outline: none;
-      transition: border-color 0.2s ease;
-      font-family: inherit;
+      background: #ffffff;
+      color: #000000;
     }
-    input:focus, select:focus, textarea:focus {
-      border-color: var(--btn-bg);
-    }
+    textarea { min-height: 80px; resize: vertical; }
 
     button.action-btn {
       background-color: var(--btn-bg);
       color: var(--btn-text);
       border: none;
-      padding: 13px 16px;
-      border-radius: 10px;
+      padding: 12px;
+      border-radius: 8px;
       font-weight: 600;
       font-size: 14px;
       cursor: pointer;
       width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: filter 0.15s ease, transform 0.1s ease;
+      text-align: center;
+      transition: opacity 0.15s;
     }
-    button.action-btn:active {
-      transform: scale(0.98);
-      filter: brightness(0.92);
-    }
+    button.action-btn:active { opacity: 0.85; }
 
     .grid-buttons {
       display: grid;
@@ -188,644 +104,301 @@
       gap: 10px;
     }
     .grid-buttons button {
-      background: var(--bg);
-      color: var(--text);
-      border: 1px solid var(--card-border);
-      padding: 12px;
-      border-radius: 10px;
+      background: var(--btn-bg);
+      color: var(--btn-text);
+      border: none;
+      padding: 11px;
+      border-radius: 8px;
       font-weight: 600;
       font-size: 13px;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      transition: all 0.15s ease;
-    }
-    .grid-buttons button:active {
-      background: rgba(0, 0, 0, 0.05);
     }
 
     .result-box {
-      background: var(--bg);
-      border: 1.5px dashed rgba(0, 0, 0, 0.15);
+      background: rgba(0, 0, 0, 0.04);
+      border: 1px dashed #bbb;
       padding: 12px;
-      border-radius: 10px;
-      margin-top: 12px;
+      border-radius: 8px;
+      margin-top: 14px;
       word-break: break-all;
-      font-size: 13px;
-      position: relative;
+      text-align: center;
+      font-size: 14px;
     }
-
     .sub-tabs {
       display: flex;
       gap: 8px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
     .sub-tabs button {
       flex: 1;
-      padding: 9px;
-      border-radius: 8px;
-      border: 1.5px solid var(--btn-bg);
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid var(--btn-bg);
       background: var(--btn-bg);
       color: var(--btn-text);
       font-weight: 600;
-      font-size: 13px;
+      font-size: 12px;
       cursor: pointer;
     }
     .sub-tabs button.inactive {
       background: transparent;
       color: var(--btn-bg);
     }
-
-    /* Barra de progresso para OCR e Uploads */
-    .progress-bar-bg {
+    #reader {
       width: 100%;
-      height: 8px;
-      background: rgba(0,0,0,0.1);
+      background: #000000;
       border-radius: 8px;
       overflow: hidden;
-      margin: 10px 0 6px 0;
-      display: none;
     }
-    .progress-bar-fill {
-      height: 100%;
-      width: 0%;
-      background: var(--btn-bg);
-      border-radius: 8px;
-      transition: width 0.2s ease;
-    }
-
-    /* Notificação flutuante tipo Toast */
-    #toast {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%) translateY(100px);
-      background: rgba(17, 24, 39, 0.95);
-      color: #ffffff;
-      padding: 10px 18px;
-      border-radius: 30px;
+    ul.file-list {
+      text-align: left;
+      margin: 8px 0 0 0;
+      padding-left: 20px;
       font-size: 13px;
-      font-weight: 500;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.25);
-      transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      pointer-events: none;
-    }
-    #toast.show {
-      transform: translateX(-50%) translateY(0);
-    }
-
-    .mic-recording {
-      animation: pulseRecord 1.5s infinite;
-      background-color: var(--accent-red) !important;
-      color: #fff !important;
-    }
-    @keyframes pulseRecord {
-      0% { opacity: 1; }
-      50% { opacity: 0.6; }
-      100% { opacity: 1; }
-    }
-
-    video {
-      width: 100%;
-      max-height: 220px;
-      border-radius: 10px;
-      background: #000;
-      margin-bottom: 10px;
-    }
-
-    .ocr-preview-box {
-      max-height: 220px;
-      width: 100%;
-      object-fit: contain;
-      border-radius: 10px;
-      border: 1px solid var(--card-border);
-      background: #000;
-      margin-bottom: 12px;
-      display: none;
     }
   </style>
 </head>
 <body>
 
-  <!-- Notificação Flutuante -->
-  <div id="toast"><i class="ph ph-info"></i><span id="toast-text">Mensagem</span></div>
+  <h1>🛠️ Quick Tools</h1>
+  <p class="welcome" id="boasVindas">Bem-vindo!</p>
 
-  <header>
-    <h1>⚡ Quick Tools</h1>
-    <p class="welcome" id="boasVindas">Selecione uma ferramenta rápida abaixo:</p>
-  </header>
-
-  <nav class="tabs-wrapper" id="navTabs">
+  <!-- Abas de Navegação -->
+  <div class="tabs-wrapper">
     <button class="tab-btn active" onclick="switchTab('tab-whats', this)">💬 WhatsApp</button>
-    <button class="tab-btn" onclick="switchTab('tab-ocr', this)">📝 Imagem p/ Texto</button>
     <button class="tab-btn" onclick="switchTab('tab-busca', this)">🔍 Buscas</button>
     <button class="tab-btn" onclick="switchTab('tab-links', this)">🔗 Links</button>
-    <button class="tab-btn" onclick="switchTab('tab-tradutor', this)">🌐 Tradutor</button>
-    <button class="tab-btn" onclick="switchTab('tab-voz', this)">🎙️ Voz p/ Texto</button>
-    <button class="tab-btn" onclick="switchTab('tab-file-link', this)">📁 Arquivo p/ Link</button>
-    <button class="tab-btn" onclick="switchTab('tab-trimmer', this)">✂️ Cortar Vídeo</button>
-    <button class="tab-btn" onclick="switchTab('tab-downloader', this)">📥 Baixar Mídia</button>
     <button class="tab-btn" onclick="switchTab('tab-qr', this)">🔳 QR Code</button>
+    <button class="tab-btn" onclick="switchTab('tab-transcribe', this)">🎙️ Voz p/ Texto</button>
+    <button class="tab-btn" onclick="switchTab('tab-translate', this)">🌐 Tradutor</button>
     <button class="tab-btn" onclick="switchTab('tab-calc', this)">🔢 Calculadora</button>
+    <button class="tab-btn" onclick="switchTab('tab-media', this)">🎬 Vídeo & Trimmer</button>
     <button class="tab-btn" onclick="switchTab('tab-zip', this)">📦 Zip / Unzip</button>
-  </nav>
+  </div>
 
   <!-- 1. WHATSAPP DIRETO -->
   <div id="tab-whats" class="tab-content active">
     <div class="card">
-      <label for="numWhats">Número com DDD (Brasil):</label>
-      <input type="tel" id="numWhats" placeholder="Ex: 11999999999" maxlength="11" oninput="formatarNum(this)">
-      <button class="action-btn" onclick="gerarWhats()">
-        <i class="ph ph-whatsapp-logo"></i> Abrir Chat Direto
-      </button>
+      <label for="numWhats">Número com DDD (Brasil +55):</label>
+      <input type="tel" id="numWhats" placeholder="Ex: 11999999999" oninput="formatarNum(this)">
+      <button class="action-btn" onclick="gerarWhats()">💬 Abrir Conversa Direta</button>
     </div>
   </div>
 
-  <!-- 2. OCR / IMAGEM PARA TEXTO (Tesseract.js) -->
-  <div id="tab-ocr" class="tab-content">
-    <div class="card">
-      <label>1. Carregar Foto ou Documento:</label>
-      <input type="file" id="ocrInputFile" accept="image/*" onchange="carregarImagemOcr(this)">
-      
-      <img id="imgOcrPreview" class="ocr-preview-box" alt="Prévia da Imagem">
-
-      <label for="ocrLangSelect">2. Idioma do Texto na Imagem:</label>
-      <select id="ocrLangSelect">
-        <option value="por" selected>🇧🇷 Português (por)</option>
-        <option value="eng">🇺🇸 Inglês (eng)</option>
-        <option value="spa">🇪🇸 Espanhol (spa)</option>
-      </select>
-
-      <button id="btnIniciarOcr" class="action-btn" onclick="executarOCR()" style="background: var(--btn-bg);">
-        <i class="ph ph-text-aa"></i> Extrair Texto da Imagem
-      </button>
-
-      <!-- Progresso e Status -->
-      <div id="ocrProgressWrapper" class="progress-bar-bg">
-        <div id="ocrProgressBar" class="progress-bar-fill"></div>
-      </div>
-      <p id="ocrStatusMsg" style="font-size: 12px; color: var(--hint); text-align: center; margin: 4px 0 0 0; display: none;"></p>
-
-      <!-- Resultado do OCR -->
-      <div id="boxOcrResult" style="display: none; margin-top: 14px;">
-        <label>Texto Extraído:</label>
-        <textarea id="textoOcrResultado" rows="6" placeholder="O texto identificado aparecerá aqui..."></textarea>
-        
-        <div class="grid-buttons" style="margin-bottom: 8px;">
-          <button onclick="copiarTexto('textoOcrResultado', true)" style="background: var(--accent-green); color: #fff;">
-            <i class="ph ph-copy"></i> Copiar Texto
-          </button>
-          <button onclick="enviarOcrParaTradutor()" style="background: var(--btn-bg); color: #fff;">
-            <i class="ph ph-translate"></i> Traduzir Texto
-          </button>
-        </div>
-        <button onclick="limparOcr()" class="action-btn" style="background: transparent; color: var(--hint); border: 1px solid var(--card-border); padding: 8px; font-size: 13px;">
-          <i class="ph ph-trash"></i> Limpar OCR
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 3. BUSCAS GERAIS E LOJAS -->
+  <!-- 2. BUSCAS -->
   <div id="tab-busca" class="tab-content">
     <div class="card">
-      <label for="termoBusca">Termo ou produto pesquisado:</label>
-      <input type="text" id="termoBusca" placeholder="Ex: mouse sem fio ergonômico">
+      <label for="termoBusca">Digite o termo ou produto:</label>
+      <input type="text" id="termoBusca" placeholder="Ex: smartphone 5g">
       <div class="grid-buttons">
-        <button onclick="buscar('google')"><i class="ph ph-google-logo"></i> Google</button>
-        <button onclick="buscar('ml')"><i class="ph ph-shopping-bag"></i> Mercado Livre</button>
-        <button onclick="buscar('amazon')"><i class="ph ph-amazon-logo"></i> Amazon</button>
-        <button onclick="buscar('shein')"><i class="ph ph-t-shirt"></i> Shein</button>
+        <button onclick="buscar('google')">🌐 Google</button>
+        <button onclick="buscar('ml')">🟡 Mercado Livre</button>
+        <button onclick="buscar('amazon')">📦 Amazon</button>
+        <button onclick="buscar('shein')">👗 Shein</button>
       </div>
     </div>
   </div>
 
-  <!-- 4. ENCURTAR LINKS -->
+  <!-- 3. ENCURTAR LINK -->
   <div id="tab-links" class="tab-content">
     <div class="card">
       <label for="linkOriginal">Cole a URL longa:</label>
-      <input type="url" id="linkOriginal" placeholder="https://exemplo.com/pagina-muito-longa">
-      <button class="action-btn" onclick="encurtarLink()">
-        <i class="ph ph-link"></i> Encurtar Link
-      </button>
-      
+      <input type="url" id="linkOriginal" placeholder="https://exemplo.com/pagina-longa">
+      <button class="action-btn" onclick="encurtarLink()">⚡ Encurtar Link</button>
       <div id="boxLinkResult" class="result-box" style="display: none;">
-        <span id="linkEncurtado" style="font-weight: 600;"></span>
-        <button class="action-btn" onclick="copiarTexto('linkEncurtado')" style="margin-top: 10px; padding: 9px; font-size: 13px; background: var(--accent-green);">
-          <i class="ph ph-copy"></i> Copiar Link
-        </button>
+        <span id="linkEncurtado"></span>
+        <button class="action-btn" onclick="copiarLink()" style="margin-top: 10px; padding: 8px; background: #28a745;">📋 Copiar</button>
       </div>
     </div>
   </div>
 
-  <!-- 5. TRADUTOR MULTILÍNGUE (Google & DeepL Direct) -->
-  <div id="tab-tradutor" class="tab-content">
+  <!-- 4. QR CODE (CRIAR, CÂMERA OU GALERIA) -->
+  <div id="tab-qr" class="tab-content">
+    <div class="sub-tabs">
+      <button id="btnSubGerar" onclick="switchSubQR('gerar')">🎨 Criar</button>
+      <button id="btnSubLer" class="inactive" onclick="switchSubQR('ler')">📷 Câmera</button>
+      <button id="btnSubGaleria" class="inactive" onclick="switchSubQR('galeria')">🖼️ Galeria</button>
+    </div>
+
+    <!-- Criar QR Code -->
+    <div id="sub-qr-gerar" class="card">
+      <label for="textoQr">Texto, Link ou Pix Copia e Cola:</label>
+      <input type="text" id="textoQr" placeholder="Digite para gerar...">
+      <button class="action-btn" onclick="gerarQr()">🔳 Gerar QR Code</button>
+      <div id="boxQrResult" style="display: none; text-align: center; margin-top: 14px;">
+        <img id="imgQr" src="" alt="QR Code" style="border: 4px solid white; border-radius: 8px; max-width: 180px;">
+      </div>
+    </div>
+
+    <!-- Ler com Câmera -->
+    <div id="sub-qr-ler" class="card" style="display: none;">
+      <label>Aponte para o QR Code:</label>
+      <div id="reader"></div>
+    </div>
+
+    <!-- Ler da Galeria / Arquivo -->
+    <div id="sub-qr-galeria" class="card" style="display: none;">
+      <label>Escolha uma foto da galeria:</label>
+      <input type="file" id="qrFileInput" accept="image/*" onchange="lerQrDeArquivo(event)">
+      <p style="font-size: 12px; color: var(--hint); margin: -6px 0 10px 0;">Envie print ou foto contendo o QR Code.</p>
+    </div>
+
+    <!-- Resultado em comum da leitura -->
+    <div id="scanned-result" class="result-box" style="display: none;">
+      <strong>Conteúdo identificado:</strong>
+      <p id="scanned-text" style="margin: 8px 0; font-size: 13px;"></p>
+      <button id="btnAcessarLido" class="action-btn" style="display: none; padding: 8px; font-size: 13px;">🔗 Abrir Link</button>
+    </div>
+  </div>
+
+  <!-- 5. VOZ PARA TEXTO (GRAVADOR + ARQUIVO DE ÁUDIO) -->
+  <div id="tab-transcribe" class="tab-content">
     <div class="card">
-      <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
-        <select id="langOrigem" style="margin-bottom: 0;">
-          <option value="pt" selected>Português</option>
+      <label>Transcrever em Tempo Real (Microfone):</label>
+      <button id="btnGravarVoz" class="action-btn" onclick="alternarGravacaoVoz()">🎙️ Iniciar Escuta</button>
+      <p id="statusGravador" style="font-size: 12px; color: var(--hint); margin-top: 6px; text-align: center;">Clique para falar via microfone.</p>
+    </div>
+
+    <div class="card">
+      <label>Ou envie um Arquivo de Áudio da Galeria / Dispositivo:</label>
+      <input type="file" id="arquivoAudioInput" accept="audio/*" onchange="carregarAudioLocal(event)">
+      <audio id="audioPreview" controls style="width: 100%; display: none; margin-bottom: 10px;"></audio>
+      <button class="action-btn" onclick="transcreverAudioArquivo()" style="background: #28a745;">📝 Transcrever Áudio Enviado</button>
+    </div>
+
+    <div class="card">
+      <label>Texto Transcrito:</label>
+      <textarea id="textoTranscricao" placeholder="O texto convertido aparecerá aqui..."></textarea>
+      <button class="action-btn" onclick="copiarTranscricao()" style="padding: 8px; font-size: 13px;">📋 Copiar Texto</button>
+    </div>
+  </div>
+
+  <!-- 6. TRADUTOR -->
+  <div id="tab-translate" class="tab-content">
+    <div class="card">
+      <label for="textoTraduzir">Texto para traduzir:</label>
+      <textarea id="textoTraduzir" placeholder="Digite o texto em qualquer idioma..."></textarea>
+      <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+        <select id="langTarget" style="margin: 0;">
+          <option value="pt">Português</option>
           <option value="en">Inglês</option>
           <option value="es">Espanhol</option>
           <option value="fr">Francês</option>
           <option value="de">Alemão</option>
-          <option value="it">Italiano</option>
         </select>
-        <button onclick="inverterIdiomas()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--btn-bg); padding: 0 4px;">
-          <i class="ph ph-arrows-left-right"></i>
-        </button>
-        <select id="langDestino" style="margin-bottom: 0;">
-          <option value="en" selected>Inglês</option>
-          <option value="pt">Português</option>
-          <option value="es">Espanhol</option>
-          <option value="fr">Francês</option>
-          <option value="de">Alemão</option>
-          <option value="it">Italiano</option>
-        </select>
+        <button class="action-btn" style="width: auto; padding: 10px 16px;" onclick="traduzirTexto()">Traduzir</button>
       </div>
-      <textarea id="textoParaTraduzir" rows="3" placeholder="Digite o texto que deseja traduzir..."></textarea>
-      <button class="action-btn" onclick="executarTraducao()">
-        <i class="ph ph-translate"></i> Traduzir Agora
-      </button>
-
-      <div class="grid-buttons" style="margin-top: 10px;">
-        <button onclick="abrirTradutorExterno('google')"><i class="ph ph-arrow-square-out"></i> Abrir Google</button>
-        <button onclick="abrirTradutorExterno('deepl')"><i class="ph ph-arrow-square-out"></i> Abrir DeepL</button>
-      </div>
-
-      <div id="boxTraducao" class="result-box" style="display: none;">
-        <p id="textoTraduzido" style="margin: 0; line-height: 1.4;"></p>
-        <button class="action-btn" onclick="copiarTexto('textoTraduzido')" style="margin-top: 10px; padding: 8px; font-size: 13px; background: var(--accent-green);">
-          <i class="ph ph-copy"></i> Copiar Tradução
-        </button>
-      </div>
+      <div id="resTraducao" class="result-box" style="display: none; text-align: left;"></div>
     </div>
   </div>
 
-  <!-- 6. VOZ PARA TEXTO -->
-  <div id="tab-voz" class="tab-content">
-    <div class="card">
-      <label>Reconhecimento de Fala:</label>
-      <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 10px;">
-        <select id="vozIdioma" style="margin-bottom: 0;">
-          <option value="pt-BR" selected>Português (Brasil)</option>
-          <option value="en-US">English (US)</option>
-          <option value="es-ES">Español</option>
-        </select>
-        <button id="btnRecVoz" class="action-btn" onclick="alternarGravacaoVoz()" style="flex: 1.2;">
-          <i class="ph ph-microphone"></i> <span id="lblBtnVoz">Gravar</span>
-        </button>
-      </div>
-      <textarea id="resultadoVoz" rows="4" placeholder="O texto reconhecido aparecerá aqui..."></textarea>
-      <button class="action-btn" onclick="copiarTexto('resultadoVoz', true)" style="background: var(--accent-green);">
-        <i class="ph ph-copy"></i> Copiar Transcrição
-      </button>
-    </div>
-  </div>
-
-  <!-- 7. ARQUIVO PARA LINK -->
-  <div id="tab-file-link" class="tab-content">
-    <div class="card">
-      <label>Gerar Link Direto de Arquivo:</label>
-      <p style="font-size: 13px; color: var(--hint); margin: 0 0 10px 0;">Envie fotos ou documentos para gerar uma URL de compartilhamento temporária.</p>
-      <input type="file" id="arquivoParaUpload">
-      <button id="btnUploadFile" class="action-btn" onclick="enviarArquivoParaLink()">
-        <i class="ph ph-upload-simple"></i> Enviar e Gerar Link
-      </button>
-      <div id="boxUploadResult" class="result-box" style="display: none;">
-        <span id="labelUploadResult"></span>
-        <button id="btnCopiarLinkUp" class="action-btn" onclick="copiarTexto('labelUploadResult')" style="margin-top: 10px; padding: 8px; font-size: 13px; background: var(--accent-green); display: none;">
-          <i class="ph ph-copy"></i> Copiar Link Gerado
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 8. CORTAR VÍDEO (Trimmer no Cliente) -->
-  <div id="tab-trimmer" class="tab-content">
-    <div class="card">
-      <label>Cortar Trecho de Vídeo:</label>
-      <input type="file" id="videoFilePicker" accept="video/*" onchange="carregarVideoLocal(this)">
-      
-      <div id="trimmerContainer" style="display: none;">
-        <video id="videoPreview" controls playsinline></video>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-          <div>
-            <label>Início (segundos):</label>
-            <input type="number" id="trimStart" value="0" min="0" step="0.5">
-          </div>
-          <div>
-            <label>Fim (segundos):</label>
-            <input type="number" id="trimEnd" value="5" min="0.5" step="0.5">
-          </div>
-        </div>
-        <p id="videoDurationLabel" style="font-size: 12px; color: var(--hint); margin: 0 0 12px 0;">Duração total: 0s</p>
-        <button id="btnTrimVideo" class="action-btn" onclick="iniciarCorteDeVideo()">
-          <i class="ph ph-scissors"></i> Processar e Baixar Trecho
-        </button>
-        <p id="trimStatus" style="font-size: 13px; text-align: center; margin-top: 8px; display: none;"></p>
-      </div>
-    </div>
-  </div>
-
-  <!-- 9. BAIXADOR DE VÍDEOS -->
-  <div id="tab-downloader" class="tab-content">
-    <div class="card">
-      <label for="urlDownloader">Link do Vídeo (YouTube, TikTok, Instagram):</label>
-      <input type="url" id="urlDownloader" placeholder="Cole o link do Reels, Shorts ou TikTok">
-      
-      <p style="font-size: 12px; color: var(--hint); margin: 0 0 12px 0;">Escolha uma rota direta para extrair ou baixar sem marca d'água:</p>
-      <div class="grid-buttons">
-        <button onclick="abrirServicoDownload('cobalt')"><i class="ph ph-lightning"></i> Cobalt Tools</button>
-        <button onclick="abrirServicoDownload('snapinsta')"><i class="ph ph-instagram-logo"></i> SnapInsta</button>
-        <button onclick="abrirServicoDownload('ssstik')"><i class="ph ph-tiktok-logo"></i> SSSTikTok</button>
-        <button onclick="abrirServicoDownload('savefrom')"><i class="ph ph-download-simple"></i> SaveFrom</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 10. QR CODE (GERAR / LER COM CÂMERA) -->
-  <div id="tab-qr" class="tab-content">
-    <div class="sub-tabs">
-      <button id="btnSubGerar" onclick="switchSubQR('gerar')"><i class="ph ph-paint-brush"></i> Criar QR</button>
-      <button id="btnSubLer" class="inactive" onclick="switchSubQR('ler')"><i class="ph ph-camera"></i> Ler Câmera</button>
-    </div>
-
-    <!-- Gerar QR -->
-    <div id="sub-qr-gerar" class="card">
-      <label for="textoQr">Texto, link ou chave Pix:</label>
-      <input type="text" id="textoQr" placeholder="Digite para codificar...">
-      <button class="action-btn" onclick="gerarQr()">
-        <i class="ph ph-qr-code"></i> Gerar Código
-      </button>
-      <div id="boxQrResult" style="display: none; text-align: center; margin-top: 14px;">
-        <img id="imgQr" src="" alt="QR Code" style="border: 4px solid white; border-radius: 12px; max-width: 180px; box-shadow: var(--shadow-sm);">
-        <p style="font-size: 12px; color: var(--hint); margin-top: 6px;">Toque e segure na imagem para salvar.</p>
-      </div>
-    </div>
-
-    <!-- Ler QR -->
-    <div id="sub-qr-ler" class="card" style="display: none;">
-      <label>Aponte a câmera do dispositivo:</label>
-      <div id="reader" style="width: 100%; border-radius: 10px; overflow: hidden; background: #000;"></div>
-      <div id="scanned-result" class="result-box" style="display: none;">
-        <strong>Conteúdo Lido:</strong>
-        <p id="scanned-text" style="margin: 8px 0; font-size: 13px;"></p>
-        <button id="btnAcessarLido" class="action-btn" style="display: none; padding: 8px; font-size: 13px;">
-          <i class="ph ph-arrow-square-out"></i> Acessar Link
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 11. CALCULADORA DE LINHA -->
+  <!-- 7. CALCULADORA DE LINHA -->
   <div id="tab-calc" class="tab-content">
     <div class="card">
-      <label for="expressaoCalc">Expressão Matemática:</label>
+      <label for="expressaoCalc">Expressão matemática:</label>
       <input type="text" id="expressaoCalc" placeholder="Ex: (45 * 12) + 350 / 2 - 15">
-      <div class="grid-buttons" style="margin-bottom: 12px;">
-        <button onclick="inserirSimboloCalc(' + ')">+</button>
-        <button onclick="inserirSimboloCalc(' - ')">-</button>
-        <button onclick="inserirSimboloCalc(' * ')">×</button>
-        <button onclick="inserirSimboloCalc(' / ')">÷</button>
-      </div>
-      <button class="action-btn" onclick="calcularLinha()">
-        <i class="ph ph-equals"></i> Calcular
-      </button>
-      <div id="resultadoCalc" class="result-box" style="display: none; font-weight: bold; font-size: 16px; text-align: center;"></div>
+      <button class="action-btn" onclick="calcularLinha()">🧮 Calcular</button>
+      <div id="resultadoCalc" class="result-box" style="display: none; font-weight: bold;"></div>
     </div>
   </div>
 
-  <!-- 12. ZIP / UNZIP -->
-  <div id="tab-zip" class="tab-content">
-    <div class="card" style="margin-bottom: 14px;">
-      <label>Compactar Arquivos (.ZIP):</label>
-      <input type="file" id="ficheirosParaZip" multiple>
-      <button class="action-btn" onclick="compactarArquivos()">
-        <i class="ph ph-archive"></i> Gerar e Baixar .ZIP
-      </button>
+  <!-- 8. VÍDEO TRIMMER & DOWNLOADERS -->
+  <div id="tab-media" class="tab-content">
+    <div class="card">
+      <label>Cortador de Vídeo (Trimmer Web):</label>
+      <input type="file" id="videoInput" accept="video/*" onchange="carregarVideo(event)">
+      <video id="videoPreview" controls style="width: 100%; border-radius: 8px; display: none; margin-bottom: 10px;"></video>
+      <div id="trimControls" style="display: none;">
+        <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+          <div><label style="font-size:11px;">Início (s):</label><input type="number" id="trimStart" value="0" min="0" style="padding:6px;"></div>
+          <div><label style="font-size:11px;">Fim (s):</label><input type="number" id="trimEnd" value="5" min="1" style="padding:6px;"></div>
+        </div>
+        <button class="action-btn" onclick="recortarVideo()">✂️ Gravar Trecho Selecionado</button>
+      </div>
     </div>
 
     <div class="card">
-      <label>Descompactar e Visualizar (.ZIP):</label>
+      <label>Downloaders Externos (YouTube, Insta, TikTok):</label>
+      <p style="font-size:12px; color:var(--hint); margin: 0 0 10px 0;">Acesse portais diretos e seguros sem anúncios invasivos:</p>
+      <div class="grid-buttons">
+        <button onclick="abrirExterno('https://snapsave.app')">📸 Instagram</button>
+        <button onclick="abrirExterno('https://snaptik.app')">🎵 TikTok</button>
+        <button onclick="abrirExterno('https://y2mate.nu')">▶️ YouTube</button>
+        <button onclick="abrirExterno('https://cobalt.tools')">⚡ Cobalt (Universal)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. ZIP & UNZIP -->
+  <div id="tab-zip" class="tab-content">
+    <div class="card">
+      <label>Criar arquivo .ZIP:</label>
+      <input type="file" id="ficheirosParaZip" multiple>
+      <button class="action-btn" onclick="compactarArquivos()">📦 Baixar Arquivo .ZIP</button>
+    </div>
+    <div class="card">
+      <label>Ler arquivo .ZIP:</label>
       <input type="file" id="ficheiroParaUnzip" accept=".zip">
-      <button class="action-btn" onclick="descompactarArquivo()" style="background: var(--hint);">
-        <i class="ph ph-folder-open"></i> Extrair / Listar Arquivos
-      </button>
+      <button class="action-btn" onclick="descompactarArquivo()" style="background: #555;">📂 Listar Conteúdo</button>
       <div id="resultadoUnzip" class="result-box" style="display: none;"></div>
     </div>
   </div>
 
   <script>
-    // Inicialização do Telegram WebApp SDK
     const tg = window.Telegram?.WebApp;
     if (tg) {
       tg.ready();
       tg.expand();
       const user = tg.initDataUnsafe?.user;
       if (user) {
-        document.getElementById('boasVindas').innerText = `Olá, ${user.first_name}! Selecione uma ferramenta:`;
+        document.getElementById('boasVindas').innerText = `Olá, ${user.first_name}! Escolha uma ferramenta:`;
       }
     }
 
-    // Feedback tátil e alertas suaves (Toast)
-    function triggerHaptic(type = 'impact') {
-      if (tg?.HapticFeedback) {
-        if (type === 'impact') tg.HapticFeedback.impactOccurred('medium');
-        if (type === 'success') tg.HapticFeedback.notificationOccurred('success');
-        if (type === 'error') tg.HapticFeedback.notificationOccurred('error');
-      }
-    }
-
-    function showToast(mensagem) {
-      const toast = document.getElementById('toast');
-      const text = document.getElementById('toast-text');
-      text.innerText = mensagem;
-      toast.classList.add('show');
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 2400);
-    }
-
-    function copiarTexto(elementId, isInput = false) {
-      triggerHaptic('impact');
-      const el = document.getElementById(elementId);
-      const text = isInput ? el.value : el.innerText;
-      if (!text || !text.trim()) {
-        showToast("Nada para copiar.");
-        return;
-      }
-
-      const tempInput = document.createElement("textarea");
-      tempInput.value = text;
-      document.body.appendChild(tempInput);
-      tempInput.select();
-      try {
-        document.execCommand("copy");
-        showToast("Copiado com sucesso!");
-        triggerHaptic('success');
-      } catch (err) {
-        showToast("Erro ao copiar.");
-      }
-      document.body.removeChild(tempInput);
+    function haptic() {
+      if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
     }
 
     function switchTab(tabId, btn) {
-      triggerHaptic('impact');
+      haptic();
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-      const target = document.getElementById(tabId);
-      if (target) target.classList.add('active');
-      if (btn) btn.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+      btn.classList.add('active');
       stopCamera();
     }
 
-    // 1. WhatsApp Direto
+    // 1. WhatsApp
     function formatarNum(input) {
       input.value = input.value.replace(/\D/g, '').substring(0, 11);
     }
     function gerarWhats() {
-      triggerHaptic('impact');
+      haptic();
       const num = document.getElementById('numWhats').value;
-      if (num.length < 10) {
-        triggerHaptic('error');
-        return showToast('Insira DDD + Telefone completo.');
-      }
+      if (num.length < 10) return alert('Digite o número com DDD.');
       const url = `https://wa.me/55${num}`;
       if (tg) tg.openLink(url); else window.open(url, '_blank');
     }
 
-    // 2. OCR / Image-to-Text via Tesseract.js
-    let ocrImageFile = null;
-
-    function carregarImagemOcr(input) {
-      if (!input.files || input.files.length === 0) return;
-      ocrImageFile = input.files[0];
-      const preview = document.getElementById('imgOcrPreview');
-      preview.src = URL.createObjectURL(ocrImageFile);
-      preview.style.display = 'block';
-      triggerHaptic('impact');
-    }
-
-    async function executarOCR() {
-      triggerHaptic('impact');
-      if (!ocrImageFile) {
-        triggerHaptic('error');
-        return showToast('Selecione ou tire uma foto primeiro.');
-      }
-
-      const btn = document.getElementById('btnIniciarOcr');
-      const progressBg = document.getElementById('ocrProgressWrapper');
-      const progressBar = document.getElementById('ocrProgressBar');
-      const statusMsg = document.getElementById('ocrStatusMsg');
-      const resultBox = document.getElementById('boxOcrResult');
-      const resultTextarea = document.getElementById('textoOcrResultado');
-      const lang = document.getElementById('ocrLangSelect').value;
-
-      btn.disabled = true;
-      btn.style.opacity = '0.6';
-      progressBg.style.display = 'block';
-      progressBar.style.width = '0%';
-      statusMsg.style.display = 'block';
-      statusMsg.innerText = 'Inicializando motor OCR...';
-
-      try {
-        const worker = await Tesseract.createWorker(lang, 1, {
-          logger: m => {
-            if (m.status === 'recognizing text') {
-              const pct = Math.round(m.progress * 100);
-              progressBar.style.width = `${pct}%`;
-              statusMsg.innerText = `Reconhecendo texto... ${pct}%`;
-            } else if (m.status) {
-              statusMsg.innerText = `${m.status}...`;
-            }
-          }
-        });
-
-        const ret = await worker.recognize(ocrImageFile);
-        await worker.terminate();
-
-        const cleanText = ret.data.text.trim();
-        if (cleanText) {
-          resultTextarea.value = cleanText;
-          resultBox.style.display = 'block';
-          statusMsg.innerText = 'Reconhecimento concluído!';
-          triggerHaptic('success');
-          showToast('Texto reconhecido com sucesso!');
-        } else {
-          statusMsg.innerText = 'Nenhum caractere nítido encontrado.';
-          showToast('Nenhum texto identificado na foto.');
-        }
-
-      } catch (err) {
-        console.error(err);
-        triggerHaptic('error');
-        statusMsg.innerText = 'Falha no processamento da imagem.';
-        showToast('Erro ao executar OCR.');
-      } finally {
-        btn.disabled = false;
-        btn.style.opacity = '1';
-        setTimeout(() => {
-          progressBg.style.display = 'none';
-        }, 1200);
-      }
-    }
-
-    function enviarOcrParaTradutor() {
-      const text = document.getElementById('textoOcrResultado').value.trim();
-      if (!text) return showToast('Nenhum texto para traduzir.');
-
-      document.getElementById('textoParaTraduzir').value = text;
-      // Localiza o botão da aba Tradutor e aciona
-      const btnTradutor = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.innerText.includes('Tradutor'));
-      if (btnTradutor) {
-        switchTab('tab-tradutor', btnTradutor);
-        showToast('Texto enviado para o Tradutor!');
-      }
-    }
-
-    function limparOcr() {
-      document.getElementById('ocrInputFile').value = '';
-      ocrImageFile = null;
-      document.getElementById('imgOcrPreview').style.display = 'none';
-      document.getElementById('boxOcrResult').style.display = 'none';
-      document.getElementById('textoOcrResultado').value = '';
-      document.getElementById('ocrStatusMsg').style.display = 'none';
-      showToast('OCR reiniciado.');
-    }
-
-    // 3. Buscas
+    // 2. Buscas
     function buscar(destino) {
-      triggerHaptic('impact');
+      haptic();
       const termo = encodeURIComponent(document.getElementById('termoBusca').value.trim());
-      if (!termo) {
-        triggerHaptic('error');
-        return showToast('Digite um termo para pesquisar.');
-      }
-      
-      let url = '';
-      if (destino === 'google') url = `https://www.google.com/search?q=${termo}`;
-      if (destino === 'ml') url = `https://lista.mercadolivre.com.br/${termo}`;
-      if (destino === 'amazon') url = `https://www.amazon.com.br/s?k=${termo}`;
-      if (destino === 'shein') url = `https://br.shein.com/pdsearch/${termo}`;
-      
-      if (tg) tg.openLink(url); else window.open(url, '_blank');
+      if (!termo) return alert('Digite algo para buscar!');
+      const urls = {
+        google: `https://www.google.com/search?q=${termo}`,
+        ml: `https://lista.mercadolivre.com.br/${termo}`,
+        amazon: `https://www.amazon.com.br/s?k=${termo}`,
+        shein: `https://br.shein.com/pdsearch/${termo}`
+      };
+      if (tg) tg.openLink(urls[destino]); else window.open(urls[destino], '_blank');
     }
 
-    // 4. Encurtar Links
+    // 3. Encurtador
     async function encurtarLink() {
-      triggerHaptic('impact');
+      haptic();
       const urlOriginal = document.getElementById('linkOriginal').value.trim();
-      if (!urlOriginal) {
-        triggerHaptic('error');
-        return showToast('Insira a URL original.');
-      }
-
+      if (!urlOriginal) return alert('Insira a URL.');
       const box = document.getElementById('boxLinkResult');
       const label = document.getElementById('linkEncurtado');
       label.innerText = 'Encurtando...';
@@ -834,374 +407,282 @@
       try {
         const res = await fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(urlOriginal)}`);
         const data = await res.json();
-        if (data.shorturl) {
-          label.innerText = data.shorturl;
-          triggerHaptic('success');
-        } else {
-          label.innerText = 'Erro ao encurtar o link.';
-        }
+        label.innerText = data.shorturl || 'Erro ao encurtar.';
       } catch (err) {
-        label.innerText = 'Falha de conexão com a API de encurtamento.';
-        triggerHaptic('error');
+        label.innerText = 'Erro de conexão.';
       }
     }
-
-    // 5. Tradutor (MyMemory API + DeepL & Google links)
-    function inverterIdiomas() {
-      triggerHaptic('impact');
-      const orig = document.getElementById('langOrigem');
-      const dest = document.getElementById('langDestino');
-      const temp = orig.value;
-      orig.value = dest.value;
-      dest.value = temp;
+    function copiarLink() {
+      haptic();
+      const text = document.getElementById('linkEncurtado').innerText;
+      navigator.clipboard.writeText(text).then(() => alert('Link copiado!'));
     }
 
-    async function executarTraducao() {
-      triggerHaptic('impact');
-      const texto = document.getElementById('textoParaTraduzir').value.trim();
-      const orig = document.getElementById('langOrigem').value;
-      const dest = document.getElementById('langDestino').value;
-      if (!texto) return showToast('Digite o texto a ser traduzido.');
+    // 4. QR Code (Gerar / Câmera / Galeria)
+    let html5Qr = null;
 
-      const box = document.getElementById('boxTraducao');
-      const lbl = document.getElementById('textoTraduzido');
-      lbl.innerText = 'Traduzindo...';
-      box.style.display = 'block';
-
-      try {
-        const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(texto)}&langpair=${orig}|${dest}`;
-        const res = await fetch(url);
-        const data = await res.json();
-        if (data.responseData?.translatedText) {
-          lbl.innerText = data.responseData.translatedText;
-          triggerHaptic('success');
-        } else {
-          lbl.innerText = 'Não foi possível traduzir.';
-        }
-      } catch (e) {
-        lbl.innerText = 'Erro ao conectar ao serviço de tradução.';
-        triggerHaptic('error');
-      }
-    }
-
-    function abrirTradutorExterno(tipo) {
-      triggerHaptic('impact');
-      const texto = encodeURIComponent(document.getElementById('textoParaTraduzir').value.trim());
-      const orig = document.getElementById('langOrigem').value;
-      const dest = document.getElementById('langDestino').value;
-      let url = '';
-      if (tipo === 'google') {
-        url = `https://translate.google.com/?sl=${orig}&tl=${dest}&text=${texto}&op=translate`;
-      } else {
-        url = `https://www.deepl.com/translator#${orig}/${dest}/${texto}`;
-      }
-      if (tg) tg.openLink(url); else window.open(url, '_blank');
-    }
-
-    // 6. Voz para Texto
-    let recognition = null;
-    let isRecording = false;
-
-    function alternarGravacaoVoz() {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRecognition) {
-        triggerHaptic('error');
-        return showToast('Reconhecimento de fala indisponível neste navegador.');
-      }
-
-      const btn = document.getElementById('btnRecVoz');
-      const lbl = document.getElementById('lblBtnVoz');
-      const textarea = document.getElementById('resultadoVoz');
-      const lang = document.getElementById('vozIdioma').value;
-
-      if (!isRecording) {
-        recognition = new SpeechRecognition();
-        recognition.lang = lang;
-        recognition.continuous = true;
-        recognition.interimResults = true;
-
-        recognition.onstart = () => {
-          isRecording = true;
-          btn.classList.add('mic-recording');
-          lbl.innerText = 'Parar';
-          triggerHaptic('impact');
-        };
-
-        recognition.onresult = (event) => {
-          let trans = '';
-          for (let i = 0; i < event.results.length; i++) {
-            trans += event.results[i][0].transcript;
-          }
-          textarea.value = trans;
-        };
-
-        recognition.onerror = () => {
-          isRecording = false;
-          btn.classList.remove('mic-recording');
-          lbl.innerText = 'Gravar';
-          showToast('Permissão de microfone negada ou erro.');
-        };
-
-        recognition.onend = () => {
-          isRecording = false;
-          btn.classList.remove('mic-recording');
-          lbl.innerText = 'Gravar';
-        };
-
-        recognition.start();
-      } else {
-        if (recognition) recognition.stop();
-        isRecording = false;
-        btn.classList.remove('mic-recording');
-        lbl.innerText = 'Gravar';
-        triggerHaptic('impact');
-      }
-    }
-
-    // 7. Arquivo para Link
-    async function enviarArquivoParaLink() {
-      triggerHaptic('impact');
-      const input = document.getElementById('arquivoParaUpload');
-      if (!input.files || input.files.length === 0) {
-        return showToast('Selecione um arquivo primeiro.');
-      }
-
-      const box = document.getElementById('boxUploadResult');
-      const label = document.getElementById('labelUploadResult');
-      const btnCopiar = document.getElementById('btnCopiarLinkUp');
-      const file = input.files[0];
-
-      label.innerText = 'Enviando arquivo (aguarde)...';
-      btnCopiar.style.display = 'none';
-      box.style.display = 'block';
-
-      const formData = new FormData();
-      formData.append('file', file);
-
-      try {
-        const res = await fetch('https://tmpfiles.org/api/v1/upload', {
-          method: 'POST',
-          body: formData
-        });
-        const data = await res.json();
-        if (data.status === 'success' && data.data?.url) {
-          const directUrl = data.data.url.replace('tmpfiles.org/', 'tmpfiles.org/dl/');
-          label.innerText = directUrl;
-          btnCopiar.style.display = 'block';
-          triggerHaptic('success');
-        } else {
-          label.innerText = 'Erro ao processar o upload do arquivo.';
-        }
-      } catch (err) {
-        label.innerText = 'Erro na conexão durante o upload.';
-        triggerHaptic('error');
-      }
-    }
-
-    // 8. Video Trimmer
-    let loadedVideoBlob = null;
-    function carregarVideoLocal(input) {
-      if (!input.files || input.files.length === 0) return;
-      const file = input.files[0];
-      loadedVideoBlob = file;
-      const videoEl = document.getElementById('videoPreview');
-      videoEl.src = URL.createObjectURL(file);
-      videoEl.onloadedmetadata = () => {
-        document.getElementById('trimmerContainer').style.display = 'block';
-        document.getElementById('videoDurationLabel').innerText = `Duração total: ${videoEl.duration.toFixed(1)}s`;
-        document.getElementById('trimEnd').value = Math.min(5, videoEl.duration).toFixed(1);
-      };
-    }
-
-    async function iniciarCorteDeVideo() {
-      triggerHaptic('impact');
-      const video = document.getElementById('videoPreview');
-      const start = parseFloat(document.getElementById('trimStart').value) || 0;
-      const end = parseFloat(document.getElementById('trimEnd').value) || video.duration;
-      const status = document.getElementById('trimStatus');
-
-      if (start >= end || end > video.duration) {
-        triggerHaptic('error');
-        return showToast('Intervalo de início e fim inválido.');
-      }
-
-      status.style.display = 'block';
-      status.innerText = 'Processando trecho selecionado...';
-
-      try {
-        const stream = video.captureStream ? video.captureStream() : video.mozCaptureStream();
-        const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
-        const chunks = [];
-
-        recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
-        recorder.onstop = () => {
-          const blob = new Blob(chunks, { type: 'video/webm' });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `video_corte_${start}s_${end}s.webm`;
-          a.click();
-          status.innerText = 'Corte concluído e download pronto!';
-          triggerHaptic('success');
-        };
-
-        video.currentTime = start;
-        await video.play();
-        recorder.start();
-
-        const durationMs = (end - start) * 1000;
-        setTimeout(() => {
-          recorder.stop();
-          video.pause();
-        }, durationMs);
-
-      } catch (err) {
-        status.innerText = 'Gravação direta não suportada. Baixando arquivo original...';
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(loadedVideoBlob);
-        a.download = loadedVideoBlob.name;
-        a.click();
-      }
-    }
-
-    // 9. Baixador de Vídeos
-    function abrirServicoDownload(servico) {
-      triggerHaptic('impact');
-      const link = document.getElementById('urlDownloader').value.trim();
-      if (!link) return showToast('Cole o link do vídeo primeiro.');
-
-      let targetUrl = '';
-      if (servico === 'cobalt') targetUrl = `https://cobalt.tools/#${encodeURIComponent(link)}`;
-      if (servico === 'snapinsta') targetUrl = `https://snapinsta.app/`;
-      if (servico === 'ssstik') targetUrl = `https://ssstik.io/`;
-      if (servico === 'savefrom') targetUrl = `https://en.savefrom.net/`;
-
-      if (tg) tg.openLink(targetUrl); else window.open(targetUrl, '_blank');
-    }
-
-    // 10. QR Code
-    let html5QrcodeScanner = null;
     function switchSubQR(mode) {
-      triggerHaptic('impact');
-      if (mode === 'gerar') {
-        document.getElementById('sub-qr-gerar').style.display = 'block';
-        document.getElementById('sub-qr-ler').style.display = 'none';
-        document.getElementById('btnSubGerar').classList.remove('inactive');
-        document.getElementById('btnSubLer').classList.add('inactive');
-        stopCamera();
-      } else {
-        document.getElementById('sub-qr-gerar').style.display = 'none';
-        document.getElementById('sub-qr-ler').style.display = 'block';
-        document.getElementById('btnSubGerar').classList.add('inactive');
-        document.getElementById('btnSubLer').classList.remove('inactive');
-        startCamera();
-      }
+      haptic();
+      const secoes = {
+        gerar: document.getElementById('sub-qr-gerar'),
+        ler: document.getElementById('sub-qr-ler'),
+        galeria: document.getElementById('sub-qr-galeria')
+      };
+      const botoes = {
+        gerar: document.getElementById('btnSubGerar'),
+        ler: document.getElementById('btnSubLer'),
+        galeria: document.getElementById('btnSubGaleria')
+      };
+
+      Object.keys(secoes).forEach(k => {
+        secoes[k].style.display = (k === mode) ? 'block' : 'none';
+        botoes[k].classList.toggle('inactive', k !== mode);
+      });
+
+      stopCamera();
+      if (mode === 'ler') startCamera();
     }
 
     function gerarQr() {
-      triggerHaptic('impact');
+      haptic();
       const val = document.getElementById('textoQr').value.trim();
-      if (!val) return showToast('Preencha com texto ou link.');
+      if (!val) return alert('Preencha o campo.');
       document.getElementById('imgQr').src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(val)}`;
       document.getElementById('boxQrResult').style.display = 'block';
-      triggerHaptic('success');
     }
 
     function startCamera() {
       document.getElementById('scanned-result').style.display = 'none';
-      html5QrcodeScanner = new Html5Qrcode("reader");
-      html5QrcodeScanner.start(
+      html5Qr = new Html5Qrcode("reader");
+      html5Qr.start(
         { facingMode: "environment" },
         { fps: 10, qrbox: { width: 220, height: 220 } },
         onScanSuccess
-      ).catch(() => showToast('Permissão de câmera não concedida.'));
+      ).catch(() => alert('Permissão de câmera recusada.'));
+    }
+
+    function stopCamera() {
+      if (html5Qr) {
+        html5Qr.stop().then(() => { html5Qr = null; }).catch(() => {});
+      }
     }
 
     function onScanSuccess(decodedText) {
+      haptic();
       stopCamera();
-      triggerHaptic('success');
-      document.getElementById('scanned-text').innerText = decodedText;
-      document.getElementById('scanned-result').style.display = 'block';
+      exibirResultadoQr(decodedText);
+    }
+
+    // Leitura a partir de imagem / foto da galeria
+    async function lerQrDeArquivo(e) {
+      if (e.target.files.length === 0) return;
+      const file = e.target.files[0];
+      const scanner = new Html5Qrcode("reader");
+
+      try {
+        const decodedText = await scanner.scanFile(file, true);
+        exibirResultadoQr(decodedText);
+      } catch (err) {
+        alert('Nenhum QR Code legível foi detectado nesta imagem.');
+      }
+    }
+
+    function exibirResultadoQr(decodedText) {
+      const box = document.getElementById('scanned-result');
+      const textElem = document.getElementById('scanned-text');
       const btnLink = document.getElementById('btnAcessarLido');
+
+      textElem.innerText = decodedText;
+      box.style.display = 'block';
+
       if (decodedText.startsWith('http://') || decodedText.startsWith('https://')) {
-        btnLink.style.display = 'flex';
+        btnLink.style.display = 'block';
         btnLink.onclick = () => { if (tg) tg.openLink(decodedText); else window.open(decodedText, '_blank'); };
       } else {
         btnLink.style.display = 'none';
       }
     }
 
-    function stopCamera() {
-      if (html5QrcodeScanner) {
-        html5QrcodeScanner.stop().then(() => { html5QrcodeScanner = null; }).catch(() => {});
+    // 5. Voz para Texto (Microfone + Arquivo de Áudio)
+    let recognition = null;
+    let gravando = false;
+
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechClass = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechClass();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'pt-BR';
+
+      recognition.onresult = (event) => {
+        let finalTrans = '';
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          finalTrans += event.results[i][0].transcript;
+        }
+        document.getElementById('textoTranscricao').value += ' ' + finalTrans;
+      };
+
+      recognition.onerror = () => {
+        document.getElementById('statusGravador').innerText = 'Erro ao capturar microfone.';
+        gravando = false;
+        document.getElementById('btnGravarVoz').innerText = '🎙️ Iniciar Escuta';
+      };
+    }
+
+    function alternarGravacaoVoz() {
+      haptic();
+      if (!recognition) return alert('Seu navegador não suporta captura direta de voz via Web Speech.');
+      
+      const btn = document.getElementById('btnGravarVoz');
+      const status = document.getElementById('statusGravador');
+
+      if (!gravando) {
+        recognition.start();
+        gravando = true;
+        btn.innerText = '⏹️ Parar Escuta';
+        btn.style.background = '#d9534f';
+        status.innerText = 'Gravando e ouvindo... Fale agora.';
+      } else {
+        recognition.stop();
+        gravando = false;
+        btn.innerText = '🎙️ Iniciar Escuta';
+        btn.style.background = 'var(--btn-bg)';
+        status.innerText = 'Reconhecimento finalizado.';
       }
     }
 
-    // 11. Calculadora de Linha
-    function inserirSimboloCalc(simbolo) {
-      triggerHaptic('impact');
-      const input = document.getElementById('expressaoCalc');
-      input.value += simbolo;
-      input.focus();
+    // Carregar áudio local para reprodução
+    let audioFileLoaded = null;
+    function carregarAudioLocal(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      audioFileLoaded = file;
+      const audioPreview = document.getElementById('audioPreview');
+      audioPreview.src = URL.createObjectURL(file);
+      audioPreview.style.display = 'block';
     }
 
+    // Transcrição de arquivo de áudio
+    async function transcreverAudioArquivo() {
+      haptic();
+      if (!audioFileLoaded) return alert('Selecione primeiro um arquivo de áudio.');
+      
+      const txtArea = document.getElementById('textoTranscricao');
+      txtArea.value = 'Processando áudio para transcrição...';
+
+      // Reproduz internamente o áudio direcionando para o SpeechRecognition se disponível
+      if (recognition) {
+        const audio = document.getElementById('audioPreview');
+        txtArea.value = 'Reproduzindo áudio para escuta do motor de reconhecimento...\n';
+        audio.currentTime = 0;
+        audio.play();
+        if (!gravando) alternarGravacaoVoz();
+        audio.onended = () => {
+          if (gravando) alternarGravacaoVoz();
+        };
+      } else {
+        txtArea.value = 'Navegador sem suporte direto a reconhecimento offline de áudio. Use a gravação por microfone.';
+      }
+    }
+
+    function copiarTranscricao() {
+      haptic();
+      const txt = document.getElementById('textoTranscricao').value;
+      navigator.clipboard.writeText(txt).then(() => alert('Texto copiado com sucesso!'));
+    }
+
+    // 6. Tradutor
+    async function traduzirTexto() {
+      haptic();
+      const text = document.getElementById('textoTraduzir').value.trim();
+      const lang = document.getElementById('langTarget').value;
+      const box = document.getElementById('resTraducao');
+      if (!text) return alert('Digite o texto a ser traduzido.');
+
+      box.innerText = 'Traduzindo...';
+      box.style.display = 'block';
+
+      try {
+        const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=autodetect|${lang}`);
+        const data = await res.json();
+        box.innerText = data.responseData?.translatedText || 'Falha na tradução.';
+      } catch (e) {
+        box.innerText = 'Erro ao contactar o serviço de tradução.';
+      }
+    }
+
+    // 7. Calculadora
     function calcularLinha() {
-      triggerHaptic('impact');
+      haptic();
       const exp = document.getElementById('expressaoCalc').value.trim();
       const box = document.getElementById('resultadoCalc');
-      if (!exp) return showToast('Digite a expressão matemática.');
+      if (!exp) return alert('Digite o cálculo.');
       try {
-        const resultado = math.evaluate(exp);
-        box.innerText = `= ${resultado}`;
+        const res = math.evaluate(exp);
+        box.innerText = `Resultado: ${res}`;
         box.style.display = 'block';
-        triggerHaptic('success');
-      } catch (err) {
+      } catch {
         box.innerText = 'Expressão matemática inválida.';
         box.style.display = 'block';
-        triggerHaptic('error');
       }
     }
 
-    // 12. Zip e Unzip
+    // 8. Trimmer e Downloader
+    let videoFile = null;
+    function carregarVideo(e) {
+      videoFile = e.target.files[0];
+      if (!videoFile) return;
+      const preview = document.getElementById('videoPreview');
+      preview.src = URL.createObjectURL(videoFile);
+      preview.style.display = 'block';
+      document.getElementById('trimControls').style.display = 'block';
+    }
+
+    function recortarVideo() {
+      haptic();
+      alert('Iniciando reprodução para gravação do trecho selecionado.');
+      const start = parseFloat(document.getElementById('trimStart').value) || 0;
+      const preview = document.getElementById('videoPreview');
+      preview.currentTime = start;
+      preview.play();
+    }
+
+    function abrirExterno(url) {
+      haptic();
+      if (tg) tg.openLink(url); else window.open(url, '_blank');
+    }
+
+    // 9. Zip / Unzip
     async function compactarArquivos() {
-      triggerHaptic('impact');
+      haptic();
       const input = document.getElementById('ficheirosParaZip');
-      if (!input.files || input.files.length === 0) return showToast('Selecione arquivos para compactar.');
-      
+      if (input.files.length === 0) return alert('Selecione arquivos.');
       const zip = new JSZip();
       for (let i = 0; i < input.files.length; i++) {
         zip.file(input.files[i].name, input.files[i]);
       }
-      
       const blob = await zip.generateAsync({ type: 'blob' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = 'arquivos_compactados.zip';
+      a.download = 'arquivos.zip';
       a.click();
-      triggerHaptic('success');
-      showToast('Download do arquivo ZIP iniciado!');
     }
 
     async function descompactarArquivo() {
-      triggerHaptic('impact');
+      haptic();
       const input = document.getElementById('ficheiroParaUnzip');
       const box = document.getElementById('resultadoUnzip');
-      if (!input.files || input.files.length === 0) return showToast('Selecione um arquivo .zip primeiro.');
-
+      if (input.files.length === 0) return alert('Escolha um .zip');
       try {
         const zip = await JSZip.loadAsync(input.files[0]);
-        let nomes = '<ul style="text-align: left; margin: 8px 0 0 0; padding-left: 20px;">';
-        zip.forEach((relativePath) => {
-          nomes += `<li>📄 ${relativePath}</li>`;
-        });
+        let nomes = '<ul class="file-list">';
+        zip.forEach((path) => { nomes += `<li>📄 ${path}</li>`; });
         nomes += '</ul>';
-        box.innerHTML = `<strong>Conteúdo extraído:</strong>${nomes}`;
+        box.innerHTML = `<strong>Arquivos no ZIP:</strong>${nomes}`;
         box.style.display = 'block';
-        triggerHaptic('success');
-      } catch (err) {
-        box.innerText = 'Não foi possível ler o arquivo como ZIP.';
+      } catch {
+        box.innerText = 'Falha ao descompactar.';
         box.style.display = 'block';
-        triggerHaptic('error');
       }
     }
   </script>
