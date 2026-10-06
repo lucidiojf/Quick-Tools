@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Quick Tools</title>
+  <!-- SDK do Telegram Web App -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <!-- Biblioteca para Leitura de QR Code pela Câmera -->
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <style>
+    :root {
+      --bg: var(--tg-theme-bg-color, #ffffff);
+      --text: var(--tg-theme-text-color, #000000);
+      --sec-bg: var(--tg-theme-secondary-bg-color, #f1f1f1);
+      --btn-bg: var(--tg-theme-button-color, #2481cc);
+      --btn-text: var(--tg-theme-button-text-color, #ffffff);
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 16px;
+    }
+    h1 {
+      font-size: 22px;
+      text-align: center;
+      margin-bottom: 5px;
+    }
+    p.welcome {
+      text-align: center;
+      margin-top: 0;
+      font-size: 14px;
+      opacity: 0.8;
+      margin-bottom: 25px;
+    }
+    /* Abas */
+    .tabs {
+      display: flex;
+      justify-content: space-around;
+      border-bottom: 2px solid var(--sec-bg);
+      margin-bottom: 20px;
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      padding: 10px 15px;
+      color: var(--text);
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      opacity: 0.6;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s;
+    }
+    .tab-btn.active {
+      opacity: 1;
+      border-bottom: 3px solid var(--btn-bg);
+    }
+    /* Conteúdo das Abas */
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .card {
+      background: var(--sec-bg);
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    label {
+      font-weight: bold;
+      font-size: 14px;
+      display: block;
+      margin-bottom: 6px;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+    button {
+      background-color: var(--btn-bg);
+      color: var(--btn-text);
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+    }
+    button:active {
+      opacity: 0.9;
+    }
+    .result-box {
+      background: rgba(0,0,0,0.03);
+      border: 1px dashed #ccc;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 15px;
+      word-break: break-all;
+      text-align: center;
+      font-size: 15px;
+    }
+    .qr-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    #reader {
+      width: 100%;
+      background: #000;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .sub-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    .sub-tabs button {
+      font-size: 13px;
+      padding: 8px;
+    }
+    .sub-tabs .inactive {
+      background-color: transparent;
+      border: 1px solid var(--btn-bg);
+      color: var(--btn-bg);
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🛠️ Utility Tools</h1>
+  <p class="welcome" id="boasVindas">Bem-vindo!</p>
+
+  <!-- Abas de Navegação -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('tab-whats', this)">💬 WhatsApp</button>
+    <button class="tab-btn" onclick="switchTab('tab-links', this)">🔗 Links</button>
+    <button class="tab-btn" onclick="switchTab('tab-qr', this)">🔳 QR Code</button>
+  </div>
+
+  <!-- ABA 1: WhatsApp -->
+  <div id="tab-whats" class="tab-content active">
+    <div class="card">
+      <label for="numWhats">Número de Celular com DDD:</label>
+      <input type="tel" id="numWhats" placeholder="Ex: 11999999999" oninput="formatarNum(this)">
+      <button onclick="gerarWhats()">💬 Abrir Conversa Direta</button>
+    </div>
+  </div>
+
+  <!-- ABA 2: Encurtar Link -->
+  <div id="tab-links" class="tab-content">
+    <div class="card">
+      <label for="linkOriginal">Cole o link longo aqui:</label>
+      <input type="url" id="linkOriginal" placeholder="https://exemplo.com/pagina-muito-longa">
+      <button onclick="encurtarLink()">⚡ Encurtar Link</button>
+      
+      <div id="boxLinkResult" class="result-box" style="display: none;">
+        <span id="linkEncurtado"></span>
+        <button onclick="copiarLink()" style="margin-top: 8px; padding: 6px; font-size: 13px; background: #28a745;">📋 Copiar Link</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABA 3: QR Code (Gerar & Ler) -->
+  <div id="tab-qr" class="tab-content">
+    <div class="sub-tabs">
+      <button id="btnSubGerar" class="" onclick="switchSubQR('gerar')">🎨 Criar QR</button>
+      <button id="btnSubLer" class="inactive" onclick="switchSubQR('ler')">📷 Ler com Câmera</button>
+    </div>
+
+    <!-- Gerar QR Code -->
+    <div id="sub-qr-gerar" class="card">
+      <label for="textoQr">Texto, link ou Pix para o QR Code:</label>
+      <input type="text" id="textoQr" placeholder="Digite aqui o que quiser codificar...">
+      <button onclick="gerarQr()">🔳 Gerar QR Code</button>
+      
+      <div id="boxQrResult" class="qr-container" style="display: none; margin-top: 15px;">
+        <img id="imgQr" src="" alt="QR Code" style="border: 4px solid white; border-radius: 8px; max-width: 150px;">
+        <span style="font-size: 12px; opacity: 0.7;">Tire print ou escaneie o código acima!</span>
+      </div>
+    </div>
+
+    <!-- Ler QR Code (Câmera) -->
+    <div id="sub-qr-ler" class="card" style="display: none;">
+      <label>Aponte a câmera para o QR Code:</label>
+      <div id="reader"></div>
+      <div id="scanned-result" class="result-box" style="display: none;">
+        <strong>Conteúdo lido:</strong><br>
+        <p id="scanned-text" style="font-size: 14px; margin: 8px 0;"></p>
+        <button id="btnAcessarLido" style="display: none; padding: 6px; font-size: 13px;">🔗 Acessar Link</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Inicializar SDK do Telegram
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand(); // Abre no tamanho total da tela
+
+    // Tentar pegar o nome do usuário do Telegram
+    const user = tg.initDataUnsafe?.user;
+    if (user) {
+      document.getElementById('boasVindas').innerText = `Olá, ${user.first_name}! Escolha uma utilidade abaixo:`;
+    }
+
+    // Função de navegação entre as Abas Principais
+    function switchTab(tabId, btn) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      btn.classList.add('active');
+      
+      // Se mudar de aba, para a câmera se ela estiver ligada
+      stopCamera();
+    }
+
+    // Função de navegação entre sub-abas do QR Code
+    let html5QrcodeScanner = null;
+    function switchSubQR(mode) {
+      if (mode === 'gerar') {
+        document.getElementById('sub-qr-gerar').style.display = 'block';
+        document.getElementById('sub-qr-ler').style.display = 'none';
+        document.getElementById('btnSubGerar').classList.remove('inactive');
+        document.getElementById('btnSubLer').classList.add('inactive');
+        stopCamera();
+      } else {
+        document.getElementById('sub-qr-gerar').style.display = 'none';
+        document.getElementById('sub-qr-ler').style.display = 'block';
+        document.getElementById('btnSubGerar').classList.add('inactive');
+        document.getElementById('btnSubLer').classList.remove('inactive');
+        startCamera();
+      }
+    }
+
+    // --- FUNÇÕES DA FERRAMENTA 1: WHATSAPP ---
+    function formatarNum(input) {
+      // Remove tudo o que não for número e limita a 11 dígitos
+      let value = input.value.replace(/\D/g, '').substring(0, 11);
+      input.value = value;
+    }
+
+    function gerarWhats() {
+      const num = document.getElementById('numWhats').value;
+      if (num.length < 10) {
+        alert('Digite o número com o DDD (ex: 11999999999).');
+        return;
+      }
+      // Redireciona o usuário para abrir o chat do WhatsApp diretamente
+      tg.openLink(`https://wa.me/55${num}`);
+    }
+
+    // --- FUNÇÕES DA FERRAMENTA 2: ENCURTAR LINK ---
+    async function encurtarLink() {
+      const originalUrl = document.getElementById('linkOriginal').value.trim();
+      if (!originalUrl) {
+        alert('Por favor, insira o link.');
+        return;
+      }
+
+      const box = document.getElementById('boxLinkResult');
+      const text = document.getElementById('linkEncurtado');
+      text.innerText = "Encurtando...";
+      box.style.display = 'block';
+
+      try {
+        // Envia para a API is.gd
+        const res = await fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(originalUrl)}`);
+        const data = await res.json();
+        
+        if (data.shorturl) {
+          text.innerText = data.shorturl;
+        } else {
+          text.innerText = "Erro ao encurtar o link.";
+        }
+      } catch (err) {
+        text.innerText = "Erro de conexão, tente novamente.";
+      }
+    }
+
+    function copiarLink() {
+      const text = document.getElementById('linkEncurtado').innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Copiado para a área de transferência! 👍');
+      });
+    }
+
+    // --- FUNÇÕES DA FERRAMENTA 3: QR CODE ---
+    function gerarQr() {
+      const val = document.getElementById('textoQr').value.trim();
+      if (!val) {
+        alert('Digite algum texto, Pix ou link.');
+        return;
+      }
+      
+      const img = document.getElementById('imgQr');
+      const box = document.getElementById('boxQrResult');
+      
+      img.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(val)}`;
+      box.style.display = 'flex';
+    }
+
+    // Inicializar Câmera e Leitura de QR Code
+    function startCamera() {
+      document.getElementById('scanned-result').style.display = 'none';
+      
+      html5QrcodeScanner = new Html5Qrcode("reader");
+      
+      const config = { fps: 10, qrbox: { width: 200, height: 200 } };
+      
+      html5QrcodeScanner.start(
+        { facingMode: "environment" }, // Prioriza câmera de trás do celular
+        config,
+        onScanSuccess
+      ).catch(err => {
+        console.error("Erro ao iniciar câmera", err);
+        alert("Não foi possível acessar a câmera do celular. Verifique as permissões.");
+      });
+    }
+
+    function onScanSuccess(decodedText, decodedResult) {
+      stopCamera();
+      
+      const resBox = document.getElementById('scanned-result');
+      const resText = document.getElementById('scanned-text');
+      const btnLink = document.getElementById('btnAcessarLido');
+      
+      resText.innerText = decodedText;
+      resBox.style.display = 'block';
+
+      // Se for link, mostra botão para acessar
+      if (decodedText.startsWith('http://') || decodedText.startsWith('https://')) {
+        btnLink.style.display = 'block';
+        btnLink.onclick = () => tg.openLink(decodedText);
+      } else {
+        btnLink.style.display = 'none';
+      }
+    }
+
+    function stopCamera() {
+      if (html5QrcodeScanner) {
+        html5QrcodeScanner.stop().then(() => {
+          html5QrcodeScanner = null;
+        }).catch(err => console.log("Erro ao desligar câmera", err));
+      }
+    }
+  </script>
+</body>
+</html>
