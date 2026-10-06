@@ -12,141 +12,220 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.1/math.js"></script>
   <!-- Manipulador de ZIP -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <!-- Ícones Phosphor -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
   <style>
     :root {
-      --bg: var(--tg-theme-bg-color, #ffffff);
-      --text: var(--tg-theme-text-color, #111111);
-      --sec-bg: var(--tg-theme-secondary-bg-color, #f3f4f6);
-      --btn-bg: var(--tg-theme-button-color, #2481cc);
+      --bg: var(--tg-theme-bg-color, #f4f6fb);
+      --text: var(--tg-theme-text-color, #1e293b);
+      --sec-bg: var(--tg-theme-secondary-bg-color, #ffffff);
+      --btn-bg: var(--tg-theme-button-color, #2563eb);
       --btn-text: var(--tg-theme-button-text-color, #ffffff);
+      --hint: var(--tg-theme-hint-color, #64748b);
+      --accent-green: #10b981;
+      --accent-red: #ef4444;
+      --card-border: rgba(0, 0, 0, 0.06);
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
+
     * {
       box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
     }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
       background-color: var(--bg);
       color: var(--text);
       margin: 0;
-      padding: 16px;
+      padding: 14px 14px 40px 14px;
+      min-height: 100vh;
+      user-select: none;
     }
-    h1 {
-      font-size: 20px;
+
+    /* Cabeçalho */
+    header {
       text-align: center;
-      margin: 0 0 4px 0;
+      margin-bottom: 12px;
     }
-    p.welcome {
-      text-align: center;
-      margin: 0 0 16px 0;
+    header h1 {
+      font-size: 22px;
+      font-weight: 800;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    header p.welcome {
       font-size: 13px;
-      opacity: 0.75;
+      color: var(--hint);
+      margin: 4px 0 0 0;
     }
-    /* Barra de rolagem horizontal das Abas */
+
     .tabs-wrapper {
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      z-index: 50;
+      padding-bottom: 8px;
       overflow-x: auto;
       white-space: nowrap;
-      margin-bottom: 16px;
-      border-bottom: 2px solid var(--sec-bg);
       -webkit-overflow-scrolling: touch;
+      display: flex;
+      gap: 6px;
+      margin: 0 -14px 14px -14px;
+      padding-left: 14px;
+      padding-right: 14px;
     }
     .tabs-wrapper::-webkit-scrollbar {
       display: none;
     }
+
     .tab-btn {
-      background: none;
-      border: none;
-      display: inline-block;
-      padding: 10px 14px;
+      background: var(--sec-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 8px 14px;
       color: var(--text);
+      font-size: 13px;
       font-weight: 600;
-      font-size: 14px;
       cursor: pointer;
-      opacity: 0.6;
-      border-bottom: 3px solid transparent;
-      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      flex-shrink: 0;
+      box-shadow: var(--shadow-sm);
     }
     .tab-btn.active {
-      opacity: 1;
-      border-bottom: 3px solid var(--btn-bg);
+      background: var(--btn-bg);
+      color: var(--btn-text);
+      border-color: var(--btn-bg);
+      transform: translateY(-1px);
     }
+
+    /* Conteúdos e Cartões */
     .tab-content {
       display: none;
+      animation: fadeIn 0.2s ease-in-out;
     }
     .tab-content.active {
       display: block;
     }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     .card {
       background: var(--sec-bg);
-      border-radius: 12px;
+      border-radius: 16px;
       padding: 16px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--card-border);
+      margin-bottom: 14px;
     }
+
     label {
-      font-weight: 600;
-      font-size: 13px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--hint);
       display: block;
       margin-bottom: 6px;
     }
-    input[type="text"], input[type="tel"], input[type="url"], input[type="file"] {
+
+    input[type="text"],
+    input[type="tel"],
+    input[type="url"],
+    input[type="number"],
+    select,
+    textarea {
       width: 100%;
-      padding: 11px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 15px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1.5px solid rgba(0, 0, 0, 0.1);
+      font-size: 14px;
+      background: var(--bg);
+      color: var(--text);
       margin-bottom: 12px;
-      background: #ffffff;
-      color: #000000;
+      outline: none;
+      transition: border-color 0.2s ease;
+      font-family: inherit;
     }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--btn-bg);
+    }
+
     button.action-btn {
       background-color: var(--btn-bg);
       color: var(--btn-text);
       border: none;
-      padding: 12px;
-      border-radius: 8px;
+      padding: 13px 16px;
+      border-radius: 10px;
       font-weight: 600;
-      font-size: 15px;
+      font-size: 14px;
       cursor: pointer;
       width: 100%;
-      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: filter 0.15s ease, transform 0.1s ease;
     }
     button.action-btn:active {
-      opacity: 0.85;
+      transform: scale(0.98);
+      filter: brightness(0.92);
     }
+
     .grid-buttons {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
     }
     .grid-buttons button {
-      background: var(--btn-bg);
-      color: var(--btn-text);
-      border: none;
-      padding: 11px;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 14px;
-      cursor: pointer;
-    }
-    .result-box {
-      background: rgba(0, 0, 0, 0.04);
-      border: 1px dashed #bbb;
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--card-border);
       padding: 12px;
-      border-radius: 8px;
-      margin-top: 14px;
-      word-break: break-all;
-      text-align: center;
-      font-size: 14px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s ease;
     }
+    .grid-buttons button:active {
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    .result-box {
+      background: var(--bg);
+      border: 1.5px dashed rgba(0, 0, 0, 0.15);
+      padding: 12px;
+      border-radius: 10px;
+      margin-top: 12px;
+      word-break: break-all;
+      font-size: 13px;
+      position: relative;
+    }
+
     .sub-tabs {
       display: flex;
       gap: 8px;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
     }
     .sub-tabs button {
       flex: 1;
-      padding: 8px;
-      border-radius: 6px;
-      border: 1px solid var(--btn-bg);
+      padding: 9px;
+      border-radius: 8px;
+      border: 1.5px solid var(--btn-bg);
       background: var(--btn-bg);
       color: var(--btn-text);
       font-weight: 600;
@@ -157,143 +236,349 @@
       background: transparent;
       color: var(--btn-bg);
     }
-    #reader {
-      width: 100%;
-      background: #000000;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    ul.file-list {
-      text-align: left;
-      margin: 8px 0 0 0;
-      padding-left: 20px;
+
+    /* Notificação flutuante tipo Toast */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(17, 24, 39, 0.95);
+      color: #ffffff;
+      padding: 10px 18px;
+      border-radius: 30px;
       font-size: 13px;
+      font-weight: 500;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none;
+    }
+    #toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Específicos para mídia e áudio */
+    .mic-recording {
+      animation: pulseRecord 1.5s infinite;
+      background-color: var(--accent-red) !important;
+      color: #fff !important;
+    }
+    @keyframes pulseRecord {
+      0% { opacity: 1; }
+      50% { opacity: 0.6; }
+      100% { opacity: 1; }
+    }
+
+    video {
+      width: 100%;
+      max-height: 220px;
+      border-radius: 10px;
+      background: #000;
+      margin-bottom: 10px;
     }
   </style>
 </head>
 <body>
 
-  <h1>🛠️ Quick Tools</h1>
-  <p class="welcome" id="boasVindas">Bem-vindo!</p>
+  <!-- Notificação Flutuante -->
+  <div id="toast"><i class="ph ph-info"></i><span id="toast-text">Mensagem</span></div>
 
-  <!-- Abas de Navegação -->
-  <div class="tabs-wrapper">
+  <!-- Cabeçalho -->
+  <header>
+    <h1>⚡ Quick Tools</h1>
+    <p class="welcome" id="boasVindas">Selecione uma ferramenta rápida abaixo:</p>
+  </header>
+
+  <nav class="tabs-wrapper" id="navTabs">
     <button class="tab-btn active" onclick="switchTab('tab-whats', this)">💬 WhatsApp</button>
     <button class="tab-btn" onclick="switchTab('tab-busca', this)">🔍 Buscas</button>
     <button class="tab-btn" onclick="switchTab('tab-links', this)">🔗 Links</button>
+    <button class="tab-btn" onclick="switchTab('tab-tradutor', this)">🌐 Tradutor</button>
+    <button class="tab-btn" onclick="switchTab('tab-voz', this)">🎙️ Voz p/ Texto</button>
+    <button class="tab-btn" onclick="switchTab('tab-file-link', this)">📁 Arquivo p/ Link</button>
+    <button class="tab-btn" onclick="switchTab('tab-trimmer', this)">✂️ Cortar Vídeo</button>
+    <button class="tab-btn" onclick="switchTab('tab-downloader', this)">📥 Baixar Mídia</button>
     <button class="tab-btn" onclick="switchTab('tab-qr', this)">🔳 QR Code</button>
     <button class="tab-btn" onclick="switchTab('tab-calc', this)">🔢 Calculadora</button>
     <button class="tab-btn" onclick="switchTab('tab-zip', this)">📦 Zip / Unzip</button>
-  </div>
+  </nav>
 
-  <!-- 1. WHATSAPP DIRETO -->
   <div id="tab-whats" class="tab-content active">
     <div class="card">
-      <label for="numWhats">Número de celular com DDD:</label>
-      <input type="tel" id="numWhats" placeholder="Ex: 11999999999" oninput="formatarNum(this)">
-      <button class="action-btn" onclick="gerarWhats()">💬 Abrir Conversa Direta</button>
+      <label for="numWhats">Número com DDD (Brasil):</label>
+      <input type="tel" id="numWhats" placeholder="Ex: 11999999999" maxlength="11" oninput="formatarNum(this)">
+      <button class="action-btn" onclick="gerarWhats()">
+        <i class="ph ph-whatsapp-logo"></i> Abrir Chat Direto
+      </button>
     </div>
   </div>
 
-  <!-- 2. BUSCAS GERAIS E LOJAS -->
   <div id="tab-busca" class="tab-content">
     <div class="card">
-      <label for="termoBusca">Digite o termo ou produto procurado:</label>
-      <input type="text" id="termoBusca" placeholder="Ex: fone bluetooth sem fio">
+      <label for="termoBusca">Termo ou produto pesquisado:</label>
+      <input type="text" id="termoBusca" placeholder="Ex: mouse sem fio ergonômico">
       <div class="grid-buttons">
-        <button onclick="buscar('google')">🌐 Google</button>
-        <button onclick="buscar('ml')">🟡 Mercado Livre</button>
-        <button onclick="buscar('amazon')">📦 Amazon</button>
-        <button onclick="buscar('shein')">👗 Shein</button>
+        <button onclick="buscar('google')"><i class="ph ph-google-logo"></i> Google</button>
+        <button onclick="buscar('ml')"><i class="ph ph-shopping-bag"></i> Mercado Livre</button>
+        <button onclick="buscar('amazon')"><i class="ph ph-amazon-logo"></i> Amazon</button>
+        <button onclick="buscar('shein')"><i class="ph ph-t-shirt"></i> Shein</button>
       </div>
     </div>
   </div>
 
-  <!-- 3. ENCURTAR LINK -->
   <div id="tab-links" class="tab-content">
     <div class="card">
-      <label for="linkOriginal">Cole a URL longa que deseja encurtar:</label>
+      <label for="linkOriginal">Cole a URL longa:</label>
       <input type="url" id="linkOriginal" placeholder="https://exemplo.com/pagina-muito-longa">
-      <button class="action-btn" onclick="encurtarLink()">⚡ Encurtar Link</button>
+      <button class="action-btn" onclick="encurtarLink()">
+        <i class="ph ph-link"></i> Encurtar Link
+      </button>
       
       <div id="boxLinkResult" class="result-box" style="display: none;">
-        <span id="linkEncurtado"></span>
-        <button class="action-btn" onclick="copiarLink()" style="margin-top: 10px; padding: 8px; font-size: 13px; background: #28a745;">📋 Copiar Link</button>
+        <span id="linkEncurtado" style="font-weight: 600;"></span>
+        <button class="action-btn" onclick="copiarTexto('linkEncurtado')" style="margin-top: 10px; padding: 9px; font-size: 13px; background: var(--accent-green);">
+          <i class="ph ph-copy"></i> Copiar Link
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- 4. QR CODE (GERAR / LER) -->
+  <div id="tab-tradutor" class="tab-content">
+    <div class="card">
+      <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
+        <select id="langOrigem" style="margin-bottom: 0;">
+          <option value="pt" selected>Português</option>
+          <option value="en">Inglês</option>
+          <option value="es">Espanhol</option>
+          <option value="fr">Francês</option>
+          <option value="de">Alemão</option>
+          <option value="it">Italiano</option>
+        </select>
+        <button onclick="inverterIdiomas()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--btn-bg); padding: 0 4px;">
+          <i class="ph ph-arrows-left-right"></i>
+        </button>
+        <select id="langDestino" style="margin-bottom: 0;">
+          <option value="en" selected>Inglês</option>
+          <option value="pt">Português</option>
+          <option value="es">Espanhol</option>
+          <option value="fr">Francês</option>
+          <option value="de">Alemão</option>
+          <option value="it">Italiano</option>
+        </select>
+      </div>
+      <textarea id="textoParaTraduzir" rows="3" placeholder="Digite o texto que deseja traduzir..."></textarea>
+      <button class="action-btn" onclick="executarTraducao()">
+        <i class="ph ph-translate"></i> Traduzir Agora
+      </button>
+      <div id="boxTraducao" class="result-box" style="display: none;">
+        <p id="textoTraduzido" style="margin: 0; line-height: 1.4;"></p>
+        <button class="action-btn" onclick="copiarTexto('textoTraduzido')" style="margin-top: 10px; padding: 8px; font-size: 13px; background: var(--accent-green);">
+          <i class="ph ph-copy"></i> Copiar Tradução
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-voz" class="tab-content">
+    <div class="card">
+      <label>Reconhecimento de Fala:</label>
+      <p style="font-size: 13px; color: var(--hint); margin: 0 0 12px 0;">Fale pelo microfone para converter em texto em tempo real.</p>
+      <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+        <button id="btnRecVoz" class="action-btn" onclick="alternarGravacaoVoz()">
+          <i class="ph ph-microphone"></i> <span id="lblBtnVoz">Iniciar Gravação</span>
+        </button>
+      </div>
+      <textarea id="resultadoVoz" rows="4" placeholder="O texto reconhecido aparecerá aqui..."></textarea>
+      <button class="action-btn" onclick="copiarTexto('resultadoVoz', true)" style="background: var(--accent-green);">
+        <i class="ph ph-copy"></i> Copiar Transcrição
+      </button>
+    </div>
+  </div>
+
+  <div id="tab-file-link" class="tab-content">
+    <div class="card">
+      <label>Gerar Link Direto de Arquivo:</label>
+      <p style="font-size: 13px; color: var(--hint); margin: 0 0 10px 0;">Envie fotos, documentos ou áudios para gerar uma URL de compartilhamento.</p>
+      <input type="file" id="arquivoParaUpload">
+      <button id="btnUploadFile" class="action-btn" onclick="enviarArquivoParaLink()">
+        <i class="ph ph-upload-simple"></i> Enviar e Gerar Link
+      </button>
+      <div id="boxUploadResult" class="result-box" style="display: none;">
+        <span id="labelUploadResult"></span>
+        <button id="btnCopiarLinkUp" class="action-btn" onclick="copiarTexto('labelUploadResult')" style="margin-top: 10px; padding: 8px; font-size: 13px; background: var(--accent-green); display: none;">
+          <i class="ph ph-copy"></i> Copiar Link Gerado
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-trimmer" class="tab-content">
+    <div class="card">
+      <label>Cortar Trecho de Vídeo:</label>
+      <input type="file" id="videoFilePicker" accept="video/*" onchange="carregarVideoLocal(this)">
+      
+      <div id="trimmerContainer" style="display: none;">
+        <video id="videoPreview" controls playsinline></video>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+          <div>
+            <label>Início (segundos):</label>
+            <input type="number" id="trimStart" value="0" min="0" step="0.5">
+          </div>
+          <div>
+            <label>Fim (segundos):</label>
+            <input type="number" id="trimEnd" value="5" min="0.5" step="0.5">
+          </div>
+        </div>
+        <p id="videoDurationLabel" style="font-size: 12px; color: var(--hint); margin: 0 0 12px 0;">Duração total: 0s</p>
+        <button id="btnTrimVideo" class="action-btn" onclick="iniciarCorteDeVideo()">
+          <i class="ph ph-scissors"></i> Processar e Baixar Trecho
+        </button>
+        <p id="trimStatus" style="font-size: 13px; text-align: center; margin-top: 8px; display: none;"></p>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-downloader" class="tab-content">
+    <div class="card">
+      <label for="urlDownloader">Link do Vídeo (YouTube, TikTok, Instagram):</label>
+      <input type="url" id="urlDownloader" placeholder="Cole o link do Reels, Shorts ou TikTok">
+      
+      <p style="font-size: 12px; color: var(--hint); margin: 0 0 12px 0;">Escolha uma rota direta para extrair ou baixar sem marca d'água:</p>
+      <div class="grid-buttons">
+        <button onclick="abrirServicoDownload('cobalt')"><i class="ph ph-lightning"></i> Cobalt API</button>
+        <button onclick="abrirServicoDownload('snapinsta')"><i class="ph ph-instagram-logo"></i> SnapInsta</button>
+        <button onclick="abrirServicoDownload('ssstik')"><i class="ph ph-tiktok-logo"></i> SSSTikTok</button>
+        <button onclick="abrirServicoDownload('savefrom')"><i class="ph ph-download-simple"></i> SaveFrom</button>
+      </div>
+    </div>
+  </div>
+
   <div id="tab-qr" class="tab-content">
     <div class="sub-tabs">
-      <button id="btnSubGerar" onclick="switchSubQR('gerar')">🎨 Criar QR</button>
-      <button id="btnSubLer" class="inactive" onclick="switchSubQR('ler')">📷 Ler com Câmera</button>
+      <button id="btnSubGerar" onclick="switchSubQR('gerar')"><i class="ph ph-paint-brush"></i> Criar QR</button>
+      <button id="btnSubLer" class="inactive" onclick="switchSubQR('ler')"><i class="ph ph-camera"></i> Ler Câmera</button>
     </div>
 
-    <!-- Criar QR Code -->
+    <!-- Gerar QR -->
     <div id="sub-qr-gerar" class="card">
       <label for="textoQr">Texto, link ou código Pix:</label>
       <input type="text" id="textoQr" placeholder="Digite para codificar...">
-      <button class="action-btn" onclick="gerarQr()">🔳 Gerar Código</button>
-      
+      <button class="action-btn" onclick="gerarQr()">
+        <i class="ph ph-qr-code"></i> Gerar Código
+      </button>
       <div id="boxQrResult" style="display: none; text-align: center; margin-top: 14px;">
-        <img id="imgQr" src="" alt="QR Code" style="border: 4px solid white; border-radius: 8px; max-width: 170px;">
-        <p style="font-size: 12px; opacity: 0.7; margin-top: 6px;">Pronto para leitura ou captura de tela!</p>
+        <img id="imgQr" src="" alt="QR Code" style="border: 4px solid white; border-radius: 12px; max-width: 180px; box-shadow: var(--shadow-sm);">
+        <p style="font-size: 12px; color: var(--hint); margin-top: 6px;">Toque e segure para salvar a imagem.</p>
       </div>
     </div>
 
-    <!-- Ler QR Code com Câmera -->
+    <!-- Ler QR -->
     <div id="sub-qr-ler" class="card" style="display: none;">
-      <label>Aponte a câmera para um QR Code:</label>
-      <div id="reader"></div>
+      <label>Aponte a câmera do dispositivo:</label>
+      <div id="reader" style="width: 100%; border-radius: 10px; overflow: hidden; background: #000;"></div>
       <div id="scanned-result" class="result-box" style="display: none;">
-        <strong>Conteúdo identificado:</strong>
+        <strong>Conteúdo Lido:</strong>
         <p id="scanned-text" style="margin: 8px 0; font-size: 13px;"></p>
-        <button id="btnAcessarLido" class="action-btn" style="display: none; padding: 8px; font-size: 13px;">🔗 Abrir Link</button>
+        <button id="btnAcessarLido" class="action-btn" style="display: none; padding: 8px; font-size: 13px;">
+          <i class="ph ph-arrow-square-out"></i> Acessar Link
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- 5. CALCULADORA DE LINHA -->
   <div id="tab-calc" class="tab-content">
     <div class="card">
-      <label for="expressaoCalc">Expressão matemática em linha:</label>
+      <label for="expressaoCalc">Expressão Matemática:</label>
       <input type="text" id="expressaoCalc" placeholder="Ex: (45 * 12) + 350 / 2 - 15">
-      <button class="action-btn" onclick="calcularLinha()">🧮 Calcular</button>
-      <div id="resultadoCalc" class="result-box" style="display: none; font-weight: bold; font-size: 16px;"></div>
+      <div class="grid-buttons" style="margin-bottom: 12px;">
+        <button onclick="inserirSimboloCalc(' + ')">+</button>
+        <button onclick="inserirSimboloCalc(' - ')">-</button>
+        <button onclick="inserirSimboloCalc(' * ')">×</button>
+        <button onclick="inserirSimboloCalc(' / ')">÷</button>
+      </div>
+      <button class="action-btn" onclick="calcularLinha()">
+        <i class="ph ph-equals"></i> Calcular
+      </button>
+      <div id="resultadoCalc" class="result-box" style="display: none; font-weight: bold; font-size: 16px; text-align: center;"></div>
     </div>
   </div>
 
-  <!-- 6. ZIP / UNZIP -->
   <div id="tab-zip" class="tab-content">
     <div class="card" style="margin-bottom: 14px;">
-      <label>Compactar (Criar arquivo .ZIP):</label>
+      <label>Compactar Arquivos (.ZIP):</label>
       <input type="file" id="ficheirosParaZip" multiple>
-      <button class="action-btn" onclick="compactarArquivos()">📦 Baixar Arquivo .ZIP</button>
+      <button class="action-btn" onclick="compactarArquivos()">
+        <i class="ph ph-archive"></i> Gerar e Baixar .ZIP
+      </button>
     </div>
 
     <div class="card">
-      <label>Descompactar (Ler arquivo .ZIP):</label>
+      <label>Descompactar e Visualizar (.ZIP):</label>
       <input type="file" id="ficheiroParaUnzip" accept=".zip">
-      <button class="action-btn" onclick="descompactarArquivo()" style="background: #555;">📂 Listar Conteúdo</button>
+      <button class="action-btn" onclick="descompactarArquivo()" style="background: var(--hint);">
+        <i class="ph ph-folder-open"></i> Extrair / Listar Arquivos
+      </button>
       <div id="resultadoUnzip" class="result-box" style="display: none;"></div>
     </div>
   </div>
 
   <script>
-    // Inicialização do SDK do Telegram
+    // Inicialização do Telegram WebApp
     const tg = window.Telegram?.WebApp;
     if (tg) {
       tg.ready();
       tg.expand();
       const user = tg.initDataUnsafe?.user;
       if (user) {
-        document.getElementById('boasVindas').innerText = `Olá, ${user.first_name}! Escolha uma ferramenta:`;
+        document.getElementById('boasVindas').innerText = `Olá, ${user.first_name}! Selecione uma ferramenta:`;
       }
     }
 
-    // Navegação de Abas Principais
+    // Feedback Tátil e Notificações (Toast)
+    function triggerHaptic(type = 'impact') {
+      if (tg?.HapticFeedback) {
+        if (type === 'impact') tg.HapticFeedback.impactOccurred('medium');
+        if (type === 'success') tg.HapticFeedback.notificationOccurred('success');
+        if (type === 'error') tg.HapticFeedback.notificationOccurred('error');
+      }
+    }
+
+    function showToast(mensagem) {
+      const toast = document.getElementById('toast');
+      const text = document.getElementById('toast-text');
+      text.innerText = mensagem;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2400);
+    }
+
+    function copiarTexto(elementId, isInput = false) {
+      triggerHaptic('impact');
+      const el = document.getElementById(elementId);
+      const text = isInput ? el.value : el.innerText;
+      if (!text) return;
+
+      const tempInput = document.createElement("textarea");
+      tempInput.value = text;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      try {
+        document.execCommand("copy");
+        showToast("Copiado com sucesso!");
+        triggerHaptic('success');
+      } catch (err) {
+        showToast("Erro ao copiar.");
+      }
+      document.body.removeChild(tempInput);
+    }
+
     function switchTab(tabId, btn) {
+      triggerHaptic('impact');
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
       document.getElementById(tabId).classList.add('active');
@@ -306,16 +591,24 @@
       input.value = input.value.replace(/\D/g, '').substring(0, 11);
     }
     function gerarWhats() {
+      triggerHaptic('impact');
       const num = document.getElementById('numWhats').value;
-      if (num.length < 10) return alert('Digite o número com o DDD (ex: 11999999999).');
+      if (num.length < 10) {
+        triggerHaptic('error');
+        return showToast('Insira DDD + Telefone completo.');
+      }
       const url = `https://wa.me/55${num}`;
       if (tg) tg.openLink(url); else window.open(url, '_blank');
     }
 
-    // 2. Buscas em Lojas e Web
+    // 2. Buscas
     function buscar(destino) {
+      triggerHaptic('impact');
       const termo = encodeURIComponent(document.getElementById('termoBusca').value.trim());
-      if (!termo) return alert('Digite algo para pesquisar!');
+      if (!termo) {
+        triggerHaptic('error');
+        return showToast('Digite um termo para pesquisar.');
+      }
       
       let url = '';
       if (destino === 'google') url = `https://www.google.com/search?q=${termo}`;
@@ -326,10 +619,14 @@
       if (tg) tg.openLink(url); else window.open(url, '_blank');
     }
 
-    // 3. Encurtador de Link
+    // 3. Encurtar Links
     async function encurtarLink() {
+      triggerHaptic('impact');
       const urlOriginal = document.getElementById('linkOriginal').value.trim();
-      if (!urlOriginal) return alert('Insira a URL original.');
+      if (!urlOriginal) {
+        triggerHaptic('error');
+        return showToast('Insira a URL original.');
+      }
 
       const box = document.getElementById('boxLinkResult');
       const label = document.getElementById('linkEncurtado');
@@ -339,19 +636,242 @@
       try {
         const res = await fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(urlOriginal)}`);
         const data = await res.json();
-        label.innerText = data.shorturl || 'Erro ao encurtar.';
+        if (data.shorturl) {
+          label.innerText = data.shorturl;
+          triggerHaptic('success');
+        } else {
+          label.innerText = 'Erro ao encurtar o link.';
+        }
       } catch (err) {
-        label.innerText = 'Erro de conexão ao encurtar.';
+        label.innerText = 'Falha de conexão com a API de encurtamento.';
+        triggerHaptic('error');
       }
     }
-    function copiarLink() {
-      const text = document.getElementById('linkEncurtado').innerText;
-      navigator.clipboard.writeText(text).then(() => alert('Link copiado com sucesso!'));
+
+    // 4. Tradutor Multilíngue (MyMemory API sem chave)
+    function inverterIdiomas() {
+      triggerHaptic('impact');
+      const orig = document.getElementById('langOrigem');
+      const dest = document.getElementById('langDestino');
+      const temp = orig.value;
+      orig.value = dest.value;
+      dest.value = temp;
     }
 
-    // 4. QR Code
+    async function executarTraducao() {
+      triggerHaptic('impact');
+      const texto = document.getElementById('textoParaTraduzir').value.trim();
+      const orig = document.getElementById('langOrigem').value;
+      const dest = document.getElementById('langDestino').value;
+      if (!texto) return showToast('Digite o texto a ser traduzido.');
+
+      const box = document.getElementById('boxTraducao');
+      const lbl = document.getElementById('textoTraduzido');
+      lbl.innerText = 'Traduzindo...';
+      box.style.display = 'block';
+
+      try {
+        const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(texto)}&langpair=${orig}|${dest}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data.responseData?.translatedText) {
+          lbl.innerText = data.responseData.translatedText;
+          triggerHaptic('success');
+        } else {
+          lbl.innerText = 'Não foi possível traduzir.';
+        }
+      } catch (e) {
+        lbl.innerText = 'Erro ao conectar ao serviço de tradução.';
+        triggerHaptic('error');
+      }
+    }
+
+    // 5. Voz para Texto
+    let recognition = null;
+    let isRecording = false;
+
+    function alternarGravacaoVoz() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        triggerHaptic('error');
+        return showToast('Reconhecimento de fala não suportado neste navegador.');
+      }
+
+      const btn = document.getElementById('btnRecVoz');
+      const lbl = document.getElementById('lblBtnVoz');
+      const textarea = document.getElementById('resultadoVoz');
+
+      if (!isRecording) {
+        recognition = new SpeechRecognition();
+        recognition.lang = 'pt-BR';
+        recognition.continuous = true;
+        recognition.interimResults = true;
+
+        recognition.onstart = () => {
+          isRecording = true;
+          btn.classList.add('mic-recording');
+          lbl.innerText = 'Parar Gravação';
+          triggerHaptic('impact');
+        };
+
+        recognition.onresult = (event) => {
+          let trans = '';
+          for (let i = 0; i < event.results.length; i++) {
+            trans += event.results[i][0].transcript;
+          }
+          textarea.value = trans;
+        };
+
+        recognition.onerror = () => {
+          isRecording = false;
+          btn.classList.remove('mic-recording');
+          lbl.innerText = 'Iniciar Gravação';
+          showToast('Permissão de microfone negada ou erro.');
+        };
+
+        recognition.onend = () => {
+          isRecording = false;
+          btn.classList.remove('mic-recording');
+          lbl.innerText = 'Iniciar Gravação';
+        };
+
+        recognition.start();
+      } else {
+        if (recognition) recognition.stop();
+        isRecording = false;
+        btn.classList.remove('mic-recording');
+        lbl.innerText = 'Iniciar Gravação';
+        triggerHaptic('impact');
+      }
+    }
+
+    // 6. Arquivo para Link (Upload gratuito via tmpfiles.org)
+    async function enviarArquivoParaLink() {
+      triggerHaptic('impact');
+      const input = document.getElementById('arquivoParaUpload');
+      if (!input.files || input.files.length === 0) {
+        return showToast('Selecione um arquivo primeiro.');
+      }
+
+      const box = document.getElementById('boxUploadResult');
+      const label = document.getElementById('labelUploadResult');
+      const btnCopiar = document.getElementById('btnCopiarLinkUp');
+      const file = input.files[0];
+
+      label.innerText = 'Enviando arquivo (aguarde)...';
+      btnCopiar.style.display = 'none';
+      box.style.display = 'block';
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        const res = await fetch('https://tmpfiles.org/api/v1/upload', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        if (data.status === 'success' && data.data?.url) {
+          // Ajusta a rota do link para visualização direta
+          const directUrl = data.data.url.replace('tmpfiles.org/', 'tmpfiles.org/dl/');
+          label.innerText = directUrl;
+          btnCopiar.style.display = 'block';
+          triggerHaptic('success');
+        } else {
+          label.innerText = 'Erro ao processar o upload do arquivo.';
+        }
+      } catch (err) {
+        label.innerText = 'Erro na conexão durante o upload.';
+        triggerHaptic('error');
+      }
+    }
+
+    // 7. Video Trimmer
+    let loadedVideoBlob = null;
+    function carregarVideoLocal(input) {
+      if (!input.files || input.files.length === 0) return;
+      const file = input.files[0];
+      loadedVideoBlob = file;
+      const videoEl = document.getElementById('videoPreview');
+      videoEl.src = URL.createObjectURL(file);
+      videoEl.onloadedmetadata = () => {
+        document.getElementById('trimmerContainer').style.display = 'block';
+        document.getElementById('videoDurationLabel').innerText = `Duração total: ${videoEl.duration.toFixed(1)}s`;
+        document.getElementById('trimEnd').value = Math.min(5, videoEl.duration).toFixed(1);
+      };
+    }
+
+    async function iniciarCorteDeVideo() {
+      triggerHaptic('impact');
+      const video = document.getElementById('videoPreview');
+      const start = parseFloat(document.getElementById('trimStart').value) || 0;
+      const end = parseFloat(document.getElementById('trimEnd').value) || video.duration;
+      const status = document.getElementById('trimStatus');
+
+      if (start >= end || end > video.duration) {
+        triggerHaptic('error');
+        return showToast('Intervalo de início e fim inválido.');
+      }
+
+      status.style.display = 'block';
+      status.innerText = 'Processando trecho selecionado...';
+
+      try {
+        const stream = video.captureStream ? video.captureStream() : video.mozCaptureStream();
+        const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+        const chunks = [];
+
+        recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+        recorder.onstop = () => {
+          const blob = new Blob(chunks, { type: 'video/webm' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `video_corte_${start}s_${end}s.webm`;
+          a.click();
+          status.innerText = 'Corte concluído e download pronto!';
+          triggerHaptic('success');
+        };
+
+        video.currentTime = start;
+        await video.play();
+        recorder.start();
+
+        const durationMs = (end - start) * 1000;
+        setTimeout(() => {
+          recorder.stop();
+          video.pause();
+        }, durationMs);
+
+      } catch (err) {
+        // Fallback caso captureStream não seja suportado no browser
+        status.innerText = 'Exportação direta por gravação não suportada neste dispositivo. Baixando arquivo original...';
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(loadedVideoBlob);
+        a.download = loadedVideoBlob.name;
+        a.click();
+      }
+    }
+
+    // 8. Baixador de Vídeos
+    function abrirServicoDownload(servico) {
+      triggerHaptic('impact');
+      const link = document.getElementById('urlDownloader').value.trim();
+      if (!link) return showToast('Cole o link do vídeo primeiro.');
+
+      let targetUrl = '';
+      if (servico === 'cobalt') targetUrl = `https://cobalt.tools/#${encodeURIComponent(link)}`;
+      if (servico === 'snapinsta') targetUrl = `https://snapinsta.app/`;
+      if (servico === 'ssstik') targetUrl = `https://ssstik.io/`;
+      if (servico === 'savefrom') targetUrl = `https://en.savefrom.net/`;
+
+      if (tg) tg.openLink(targetUrl); else window.open(targetUrl, '_blank');
+    }
+
+    // 9. QR Code
     let html5QrcodeScanner = null;
     function switchSubQR(mode) {
+      triggerHaptic('impact');
       if (mode === 'gerar') {
         document.getElementById('sub-qr-gerar').style.display = 'block';
         document.getElementById('sub-qr-ler').style.display = 'none';
@@ -366,12 +886,16 @@
         startCamera();
       }
     }
+
     function gerarQr() {
+      triggerHaptic('impact');
       const val = document.getElementById('textoQr').value.trim();
-      if (!val) return alert('Preencha com texto ou link.');
+      if (!val) return showToast('Preencha com texto ou link.');
       document.getElementById('imgQr').src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(val)}`;
       document.getElementById('boxQrResult').style.display = 'block';
+      triggerHaptic('success');
     }
+
     function startCamera() {
       document.getElementById('scanned-result').style.display = 'none';
       html5QrcodeScanner = new Html5Qrcode("reader");
@@ -379,45 +903,59 @@
         { facingMode: "environment" },
         { fps: 10, qrbox: { width: 220, height: 220 } },
         onScanSuccess
-      ).catch(() => alert('Permissão de câmera não concedida ou erro ao carregar sensor.'));
+      ).catch(() => showToast('Permissão de câmera não concedida.'));
     }
+
     function onScanSuccess(decodedText) {
       stopCamera();
+      triggerHaptic('success');
       document.getElementById('scanned-text').innerText = decodedText;
       document.getElementById('scanned-result').style.display = 'block';
       const btnLink = document.getElementById('btnAcessarLido');
       if (decodedText.startsWith('http://') || decodedText.startsWith('https://')) {
-        btnLink.style.display = 'block';
+        btnLink.style.display = 'flex';
         btnLink.onclick = () => { if (tg) tg.openLink(decodedText); else window.open(decodedText, '_blank'); };
       } else {
         btnLink.style.display = 'none';
       }
     }
+
     function stopCamera() {
       if (html5QrcodeScanner) {
         html5QrcodeScanner.stop().then(() => { html5QrcodeScanner = null; }).catch(() => {});
       }
     }
 
-    // 5. Calculadora de Linha
+    // 10. Calculadora de Linha
+    function inserirSimboloCalc(simbolo) {
+      triggerHaptic('impact');
+      const input = document.getElementById('expressaoCalc');
+      input.value += simbolo;
+      input.focus();
+    }
+
     function calcularLinha() {
+      triggerHaptic('impact');
       const exp = document.getElementById('expressaoCalc').value.trim();
       const box = document.getElementById('resultadoCalc');
-      if (!exp) return alert('Digite a conta.');
+      if (!exp) return showToast('Digite a expressão matemática.');
       try {
         const resultado = math.evaluate(exp);
-        box.innerText = `Resultado: ${resultado}`;
+        box.innerText = `= ${resultado}`;
         box.style.display = 'block';
+        triggerHaptic('success');
       } catch (err) {
-        box.innerText = 'Expressão inválida. Verifique os operadores.';
+        box.innerText = 'Expressão matemática inválida.';
         box.style.display = 'block';
+        triggerHaptic('error');
       }
     }
 
-    // 6. Zip e Unzip
+    // 11. Zip e Unzip
     async function compactarArquivos() {
+      triggerHaptic('impact');
       const input = document.getElementById('ficheirosParaZip');
-      if (input.files.length === 0) return alert('Selecione arquivos para compactar.');
+      if (!input.files || input.files.length === 0) return showToast('Selecione arquivos para compactar.');
       
       const zip = new JSZip();
       for (let i = 0; i < input.files.length; i++) {
@@ -429,25 +967,30 @@
       a.href = URL.createObjectURL(blob);
       a.download = 'arquivos_compactados.zip';
       a.click();
+      triggerHaptic('success');
+      showToast('Download do arquivo ZIP iniciado!');
     }
 
     async function descompactarArquivo() {
+      triggerHaptic('impact');
       const input = document.getElementById('ficheiroParaUnzip');
       const box = document.getElementById('resultadoUnzip');
-      if (input.files.length === 0) return alert('Selecione um arquivo .zip primeiro.');
+      if (!input.files || input.files.length === 0) return showToast('Selecione um arquivo .zip primeiro.');
 
       try {
         const zip = await JSZip.loadAsync(input.files[0]);
-        let nomes = '<ul class="file-list">';
+        let nomes = '<ul style="text-align: left; margin: 8px 0 0 0; padding-left: 20px;">';
         zip.forEach((relativePath) => {
           nomes += `<li>📄 ${relativePath}</li>`;
         });
         nomes += '</ul>';
-        box.innerHTML = `<strong>Arquivos contidos no ZIP:</strong>${nomes}`;
+        box.innerHTML = `<strong>Conteúdo extraído:</strong>${nomes}`;
         box.style.display = 'block';
+        triggerHaptic('success');
       } catch (err) {
-        box.innerText = 'Não foi possível ler o arquivo selecionado como ZIP.';
+        box.innerText = 'Não foi possível ler o arquivo como ZIP.';
         box.style.display = 'block';
+        triggerHaptic('error');
       }
     }
   </script>
