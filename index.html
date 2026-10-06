@@ -12,6 +12,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.1/math.js"></script>
   <!-- Manipulador de ZIP -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <!-- Tesseract.js OCR v5 -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <!-- Ícones Phosphor -->
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
@@ -25,7 +27,8 @@
       --hint: var(--tg-theme-hint-color, #64748b);
       --accent-green: #10b981;
       --accent-red: #ef4444;
-      --card-border: rgba(0, 0, 0, 0.06);
+      --accent-orange: #f59e0b;
+      --card-border: rgba(0, 0, 0, 0.07);
       --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
 
@@ -39,12 +42,11 @@
       background-color: var(--bg);
       color: var(--text);
       margin: 0;
-      padding: 14px 14px 40px 14px;
+      padding: 14px 14px 50px 14px;
       min-height: 100vh;
       user-select: none;
     }
 
-    /* Cabeçalho */
     header {
       text-align: center;
       margin-bottom: 12px;
@@ -69,7 +71,7 @@
       top: 0;
       background: var(--bg);
       z-index: 50;
-      padding-bottom: 8px;
+      padding-bottom: 10px;
       overflow-x: auto;
       white-space: nowrap;
       -webkit-overflow-scrolling: touch;
@@ -106,7 +108,6 @@
       transform: translateY(-1px);
     }
 
-    /* Conteúdos e Cartões */
     .tab-content {
       display: none;
       animation: fadeIn 0.2s ease-in-out;
@@ -237,6 +238,24 @@
       color: var(--btn-bg);
     }
 
+    /* Barra de progresso para OCR e Uploads */
+    .progress-bar-bg {
+      width: 100%;
+      height: 8px;
+      background: rgba(0,0,0,0.1);
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 10px 0 6px 0;
+      display: none;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--btn-bg);
+      border-radius: 8px;
+      transition: width 0.2s ease;
+    }
+
     /* Notificação flutuante tipo Toast */
     #toast {
       position: fixed;
@@ -249,7 +268,7 @@
       border-radius: 30px;
       font-size: 13px;
       font-weight: 500;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.25);
       transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
       z-index: 1000;
       display: flex;
@@ -261,7 +280,6 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    /* Específicos para mídia e áudio */
     .mic-recording {
       animation: pulseRecord 1.5s infinite;
       background-color: var(--accent-red) !important;
@@ -280,6 +298,17 @@
       background: #000;
       margin-bottom: 10px;
     }
+
+    .ocr-preview-box {
+      max-height: 220px;
+      width: 100%;
+      object-fit: contain;
+      border-radius: 10px;
+      border: 1px solid var(--card-border);
+      background: #000;
+      margin-bottom: 12px;
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -287,7 +316,6 @@
   <!-- Notificação Flutuante -->
   <div id="toast"><i class="ph ph-info"></i><span id="toast-text">Mensagem</span></div>
 
-  <!-- Cabeçalho -->
   <header>
     <h1>⚡ Quick Tools</h1>
     <p class="welcome" id="boasVindas">Selecione uma ferramenta rápida abaixo:</p>
@@ -295,6 +323,7 @@
 
   <nav class="tabs-wrapper" id="navTabs">
     <button class="tab-btn active" onclick="switchTab('tab-whats', this)">💬 WhatsApp</button>
+    <button class="tab-btn" onclick="switchTab('tab-ocr', this)">📝 Imagem p/ Texto</button>
     <button class="tab-btn" onclick="switchTab('tab-busca', this)">🔍 Buscas</button>
     <button class="tab-btn" onclick="switchTab('tab-links', this)">🔗 Links</button>
     <button class="tab-btn" onclick="switchTab('tab-tradutor', this)">🌐 Tradutor</button>
@@ -307,6 +336,7 @@
     <button class="tab-btn" onclick="switchTab('tab-zip', this)">📦 Zip / Unzip</button>
   </nav>
 
+  <!-- 1. WHATSAPP DIRETO -->
   <div id="tab-whats" class="tab-content active">
     <div class="card">
       <label for="numWhats">Número com DDD (Brasil):</label>
@@ -317,6 +347,52 @@
     </div>
   </div>
 
+  <!-- 2. OCR / IMAGEM PARA TEXTO (Tesseract.js) -->
+  <div id="tab-ocr" class="tab-content">
+    <div class="card">
+      <label>1. Carregar Foto ou Documento:</label>
+      <input type="file" id="ocrInputFile" accept="image/*" onchange="carregarImagemOcr(this)">
+      
+      <img id="imgOcrPreview" class="ocr-preview-box" alt="Prévia da Imagem">
+
+      <label for="ocrLangSelect">2. Idioma do Texto na Imagem:</label>
+      <select id="ocrLangSelect">
+        <option value="por" selected>🇧🇷 Português (por)</option>
+        <option value="eng">🇺🇸 Inglês (eng)</option>
+        <option value="spa">🇪🇸 Espanhol (spa)</option>
+      </select>
+
+      <button id="btnIniciarOcr" class="action-btn" onclick="executarOCR()" style="background: var(--btn-bg);">
+        <i class="ph ph-text-aa"></i> Extrair Texto da Imagem
+      </button>
+
+      <!-- Progresso e Status -->
+      <div id="ocrProgressWrapper" class="progress-bar-bg">
+        <div id="ocrProgressBar" class="progress-bar-fill"></div>
+      </div>
+      <p id="ocrStatusMsg" style="font-size: 12px; color: var(--hint); text-align: center; margin: 4px 0 0 0; display: none;"></p>
+
+      <!-- Resultado do OCR -->
+      <div id="boxOcrResult" style="display: none; margin-top: 14px;">
+        <label>Texto Extraído:</label>
+        <textarea id="textoOcrResultado" rows="6" placeholder="O texto identificado aparecerá aqui..."></textarea>
+        
+        <div class="grid-buttons" style="margin-bottom: 8px;">
+          <button onclick="copiarTexto('textoOcrResultado', true)" style="background: var(--accent-green); color: #fff;">
+            <i class="ph ph-copy"></i> Copiar Texto
+          </button>
+          <button onclick="enviarOcrParaTradutor()" style="background: var(--btn-bg); color: #fff;">
+            <i class="ph ph-translate"></i> Traduzir Texto
+          </button>
+        </div>
+        <button onclick="limparOcr()" class="action-btn" style="background: transparent; color: var(--hint); border: 1px solid var(--card-border); padding: 8px; font-size: 13px;">
+          <i class="ph ph-trash"></i> Limpar OCR
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. BUSCAS GERAIS E LOJAS -->
   <div id="tab-busca" class="tab-content">
     <div class="card">
       <label for="termoBusca">Termo ou produto pesquisado:</label>
@@ -330,6 +406,7 @@
     </div>
   </div>
 
+  <!-- 4. ENCURTAR LINKS -->
   <div id="tab-links" class="tab-content">
     <div class="card">
       <label for="linkOriginal">Cole a URL longa:</label>
@@ -347,6 +424,7 @@
     </div>
   </div>
 
+  <!-- 5. TRADUTOR MULTILÍNGUE (Google & DeepL Direct) -->
   <div id="tab-tradutor" class="tab-content">
     <div class="card">
       <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
@@ -374,6 +452,12 @@
       <button class="action-btn" onclick="executarTraducao()">
         <i class="ph ph-translate"></i> Traduzir Agora
       </button>
+
+      <div class="grid-buttons" style="margin-top: 10px;">
+        <button onclick="abrirTradutorExterno('google')"><i class="ph ph-arrow-square-out"></i> Abrir Google</button>
+        <button onclick="abrirTradutorExterno('deepl')"><i class="ph ph-arrow-square-out"></i> Abrir DeepL</button>
+      </div>
+
       <div id="boxTraducao" class="result-box" style="display: none;">
         <p id="textoTraduzido" style="margin: 0; line-height: 1.4;"></p>
         <button class="action-btn" onclick="copiarTexto('textoTraduzido')" style="margin-top: 10px; padding: 8px; font-size: 13px; background: var(--accent-green);">
@@ -383,13 +467,18 @@
     </div>
   </div>
 
+  <!-- 6. VOZ PARA TEXTO -->
   <div id="tab-voz" class="tab-content">
     <div class="card">
       <label>Reconhecimento de Fala:</label>
-      <p style="font-size: 13px; color: var(--hint); margin: 0 0 12px 0;">Fale pelo microfone para converter em texto em tempo real.</p>
-      <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-        <button id="btnRecVoz" class="action-btn" onclick="alternarGravacaoVoz()">
-          <i class="ph ph-microphone"></i> <span id="lblBtnVoz">Iniciar Gravação</span>
+      <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 10px;">
+        <select id="vozIdioma" style="margin-bottom: 0;">
+          <option value="pt-BR" selected>Português (Brasil)</option>
+          <option value="en-US">English (US)</option>
+          <option value="es-ES">Español</option>
+        </select>
+        <button id="btnRecVoz" class="action-btn" onclick="alternarGravacaoVoz()" style="flex: 1.2;">
+          <i class="ph ph-microphone"></i> <span id="lblBtnVoz">Gravar</span>
         </button>
       </div>
       <textarea id="resultadoVoz" rows="4" placeholder="O texto reconhecido aparecerá aqui..."></textarea>
@@ -399,10 +488,11 @@
     </div>
   </div>
 
+  <!-- 7. ARQUIVO PARA LINK -->
   <div id="tab-file-link" class="tab-content">
     <div class="card">
       <label>Gerar Link Direto de Arquivo:</label>
-      <p style="font-size: 13px; color: var(--hint); margin: 0 0 10px 0;">Envie fotos, documentos ou áudios para gerar uma URL de compartilhamento.</p>
+      <p style="font-size: 13px; color: var(--hint); margin: 0 0 10px 0;">Envie fotos ou documentos para gerar uma URL de compartilhamento temporária.</p>
       <input type="file" id="arquivoParaUpload">
       <button id="btnUploadFile" class="action-btn" onclick="enviarArquivoParaLink()">
         <i class="ph ph-upload-simple"></i> Enviar e Gerar Link
@@ -416,6 +506,7 @@
     </div>
   </div>
 
+  <!-- 8. CORTAR VÍDEO (Trimmer no Cliente) -->
   <div id="tab-trimmer" class="tab-content">
     <div class="card">
       <label>Cortar Trecho de Vídeo:</label>
@@ -442,6 +533,7 @@
     </div>
   </div>
 
+  <!-- 9. BAIXADOR DE VÍDEOS -->
   <div id="tab-downloader" class="tab-content">
     <div class="card">
       <label for="urlDownloader">Link do Vídeo (YouTube, TikTok, Instagram):</label>
@@ -449,7 +541,7 @@
       
       <p style="font-size: 12px; color: var(--hint); margin: 0 0 12px 0;">Escolha uma rota direta para extrair ou baixar sem marca d'água:</p>
       <div class="grid-buttons">
-        <button onclick="abrirServicoDownload('cobalt')"><i class="ph ph-lightning"></i> Cobalt API</button>
+        <button onclick="abrirServicoDownload('cobalt')"><i class="ph ph-lightning"></i> Cobalt Tools</button>
         <button onclick="abrirServicoDownload('snapinsta')"><i class="ph ph-instagram-logo"></i> SnapInsta</button>
         <button onclick="abrirServicoDownload('ssstik')"><i class="ph ph-tiktok-logo"></i> SSSTikTok</button>
         <button onclick="abrirServicoDownload('savefrom')"><i class="ph ph-download-simple"></i> SaveFrom</button>
@@ -457,6 +549,7 @@
     </div>
   </div>
 
+  <!-- 10. QR CODE (GERAR / LER COM CÂMERA) -->
   <div id="tab-qr" class="tab-content">
     <div class="sub-tabs">
       <button id="btnSubGerar" onclick="switchSubQR('gerar')"><i class="ph ph-paint-brush"></i> Criar QR</button>
@@ -465,14 +558,14 @@
 
     <!-- Gerar QR -->
     <div id="sub-qr-gerar" class="card">
-      <label for="textoQr">Texto, link ou código Pix:</label>
+      <label for="textoQr">Texto, link ou chave Pix:</label>
       <input type="text" id="textoQr" placeholder="Digite para codificar...">
       <button class="action-btn" onclick="gerarQr()">
         <i class="ph ph-qr-code"></i> Gerar Código
       </button>
       <div id="boxQrResult" style="display: none; text-align: center; margin-top: 14px;">
         <img id="imgQr" src="" alt="QR Code" style="border: 4px solid white; border-radius: 12px; max-width: 180px; box-shadow: var(--shadow-sm);">
-        <p style="font-size: 12px; color: var(--hint); margin-top: 6px;">Toque e segure para salvar a imagem.</p>
+        <p style="font-size: 12px; color: var(--hint); margin-top: 6px;">Toque e segure na imagem para salvar.</p>
       </div>
     </div>
 
@@ -490,6 +583,7 @@
     </div>
   </div>
 
+  <!-- 11. CALCULADORA DE LINHA -->
   <div id="tab-calc" class="tab-content">
     <div class="card">
       <label for="expressaoCalc">Expressão Matemática:</label>
@@ -507,6 +601,7 @@
     </div>
   </div>
 
+  <!-- 12. ZIP / UNZIP -->
   <div id="tab-zip" class="tab-content">
     <div class="card" style="margin-bottom: 14px;">
       <label>Compactar Arquivos (.ZIP):</label>
@@ -527,7 +622,7 @@
   </div>
 
   <script>
-    // Inicialização do Telegram WebApp
+    // Inicialização do Telegram WebApp SDK
     const tg = window.Telegram?.WebApp;
     if (tg) {
       tg.ready();
@@ -538,7 +633,7 @@
       }
     }
 
-    // Feedback Tátil e Notificações (Toast)
+    // Feedback tátil e alertas suaves (Toast)
     function triggerHaptic(type = 'impact') {
       if (tg?.HapticFeedback) {
         if (type === 'impact') tg.HapticFeedback.impactOccurred('medium');
@@ -561,7 +656,10 @@
       triggerHaptic('impact');
       const el = document.getElementById(elementId);
       const text = isInput ? el.value : el.innerText;
-      if (!text) return;
+      if (!text || !text.trim()) {
+        showToast("Nada para copiar.");
+        return;
+      }
 
       const tempInput = document.createElement("textarea");
       tempInput.value = text;
@@ -581,8 +679,9 @@
       triggerHaptic('impact');
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
-      btn.classList.add('active');
+      const target = document.getElementById(tabId);
+      if (target) target.classList.add('active');
+      if (btn) btn.classList.add('active');
       stopCamera();
     }
 
@@ -601,7 +700,106 @@
       if (tg) tg.openLink(url); else window.open(url, '_blank');
     }
 
-    // 2. Buscas
+    // 2. OCR / Image-to-Text via Tesseract.js
+    let ocrImageFile = null;
+
+    function carregarImagemOcr(input) {
+      if (!input.files || input.files.length === 0) return;
+      ocrImageFile = input.files[0];
+      const preview = document.getElementById('imgOcrPreview');
+      preview.src = URL.createObjectURL(ocrImageFile);
+      preview.style.display = 'block';
+      triggerHaptic('impact');
+    }
+
+    async function executarOCR() {
+      triggerHaptic('impact');
+      if (!ocrImageFile) {
+        triggerHaptic('error');
+        return showToast('Selecione ou tire uma foto primeiro.');
+      }
+
+      const btn = document.getElementById('btnIniciarOcr');
+      const progressBg = document.getElementById('ocrProgressWrapper');
+      const progressBar = document.getElementById('ocrProgressBar');
+      const statusMsg = document.getElementById('ocrStatusMsg');
+      const resultBox = document.getElementById('boxOcrResult');
+      const resultTextarea = document.getElementById('textoOcrResultado');
+      const lang = document.getElementById('ocrLangSelect').value;
+
+      btn.disabled = true;
+      btn.style.opacity = '0.6';
+      progressBg.style.display = 'block';
+      progressBar.style.width = '0%';
+      statusMsg.style.display = 'block';
+      statusMsg.innerText = 'Inicializando motor OCR...';
+
+      try {
+        const worker = await Tesseract.createWorker(lang, 1, {
+          logger: m => {
+            if (m.status === 'recognizing text') {
+              const pct = Math.round(m.progress * 100);
+              progressBar.style.width = `${pct}%`;
+              statusMsg.innerText = `Reconhecendo texto... ${pct}%`;
+            } else if (m.status) {
+              statusMsg.innerText = `${m.status}...`;
+            }
+          }
+        });
+
+        const ret = await worker.recognize(ocrImageFile);
+        await worker.terminate();
+
+        const cleanText = ret.data.text.trim();
+        if (cleanText) {
+          resultTextarea.value = cleanText;
+          resultBox.style.display = 'block';
+          statusMsg.innerText = 'Reconhecimento concluído!';
+          triggerHaptic('success');
+          showToast('Texto reconhecido com sucesso!');
+        } else {
+          statusMsg.innerText = 'Nenhum caractere nítido encontrado.';
+          showToast('Nenhum texto identificado na foto.');
+        }
+
+      } catch (err) {
+        console.error(err);
+        triggerHaptic('error');
+        statusMsg.innerText = 'Falha no processamento da imagem.';
+        showToast('Erro ao executar OCR.');
+      } finally {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        setTimeout(() => {
+          progressBg.style.display = 'none';
+        }, 1200);
+      }
+    }
+
+    function enviarOcrParaTradutor() {
+      const text = document.getElementById('textoOcrResultado').value.trim();
+      if (!text) return showToast('Nenhum texto para traduzir.');
+
+      document.getElementById('textoParaTraduzir').value = text;
+      // Localiza o botão da aba Tradutor e aciona
+      const btnTradutor = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.innerText.includes('Tradutor'));
+      if (btnTradutor) {
+        switchTab('tab-tradutor', btnTradutor);
+        showToast('Texto enviado para o Tradutor!');
+      }
+    }
+
+    function limparOcr() {
+      document.getElementById('ocrInputFile').value = '';
+      ocrImageFile = null;
+      document.getElementById('imgOcrPreview').style.display = 'none';
+      document.getElementById('boxOcrResult').style.display = 'none';
+      document.getElementById('textoOcrResultado').value = '';
+      document.getElementById('ocrStatusMsg').style.display = 'none';
+      showToast('OCR reiniciado.');
+    }
+
+    // 3. Buscas
     function buscar(destino) {
       triggerHaptic('impact');
       const termo = encodeURIComponent(document.getElementById('termoBusca').value.trim());
@@ -619,7 +817,7 @@
       if (tg) tg.openLink(url); else window.open(url, '_blank');
     }
 
-    // 3. Encurtar Links
+    // 4. Encurtar Links
     async function encurtarLink() {
       triggerHaptic('impact');
       const urlOriginal = document.getElementById('linkOriginal').value.trim();
@@ -648,7 +846,7 @@
       }
     }
 
-    // 4. Tradutor Multilíngue (MyMemory API sem chave)
+    // 5. Tradutor (MyMemory API + DeepL & Google links)
     function inverterIdiomas() {
       triggerHaptic('impact');
       const orig = document.getElementById('langOrigem');
@@ -686,7 +884,21 @@
       }
     }
 
-    // 5. Voz para Texto
+    function abrirTradutorExterno(tipo) {
+      triggerHaptic('impact');
+      const texto = encodeURIComponent(document.getElementById('textoParaTraduzir').value.trim());
+      const orig = document.getElementById('langOrigem').value;
+      const dest = document.getElementById('langDestino').value;
+      let url = '';
+      if (tipo === 'google') {
+        url = `https://translate.google.com/?sl=${orig}&tl=${dest}&text=${texto}&op=translate`;
+      } else {
+        url = `https://www.deepl.com/translator#${orig}/${dest}/${texto}`;
+      }
+      if (tg) tg.openLink(url); else window.open(url, '_blank');
+    }
+
+    // 6. Voz para Texto
     let recognition = null;
     let isRecording = false;
 
@@ -694,23 +906,24 @@
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) {
         triggerHaptic('error');
-        return showToast('Reconhecimento de fala não suportado neste navegador.');
+        return showToast('Reconhecimento de fala indisponível neste navegador.');
       }
 
       const btn = document.getElementById('btnRecVoz');
       const lbl = document.getElementById('lblBtnVoz');
       const textarea = document.getElementById('resultadoVoz');
+      const lang = document.getElementById('vozIdioma').value;
 
       if (!isRecording) {
         recognition = new SpeechRecognition();
-        recognition.lang = 'pt-BR';
+        recognition.lang = lang;
         recognition.continuous = true;
         recognition.interimResults = true;
 
         recognition.onstart = () => {
           isRecording = true;
           btn.classList.add('mic-recording');
-          lbl.innerText = 'Parar Gravação';
+          lbl.innerText = 'Parar';
           triggerHaptic('impact');
         };
 
@@ -725,14 +938,14 @@
         recognition.onerror = () => {
           isRecording = false;
           btn.classList.remove('mic-recording');
-          lbl.innerText = 'Iniciar Gravação';
+          lbl.innerText = 'Gravar';
           showToast('Permissão de microfone negada ou erro.');
         };
 
         recognition.onend = () => {
           isRecording = false;
           btn.classList.remove('mic-recording');
-          lbl.innerText = 'Iniciar Gravação';
+          lbl.innerText = 'Gravar';
         };
 
         recognition.start();
@@ -740,12 +953,12 @@
         if (recognition) recognition.stop();
         isRecording = false;
         btn.classList.remove('mic-recording');
-        lbl.innerText = 'Iniciar Gravação';
+        lbl.innerText = 'Gravar';
         triggerHaptic('impact');
       }
     }
 
-    // 6. Arquivo para Link (Upload gratuito via tmpfiles.org)
+    // 7. Arquivo para Link
     async function enviarArquivoParaLink() {
       triggerHaptic('impact');
       const input = document.getElementById('arquivoParaUpload');
@@ -772,7 +985,6 @@
         });
         const data = await res.json();
         if (data.status === 'success' && data.data?.url) {
-          // Ajusta a rota do link para visualização direta
           const directUrl = data.data.url.replace('tmpfiles.org/', 'tmpfiles.org/dl/');
           label.innerText = directUrl;
           btnCopiar.style.display = 'block';
@@ -786,7 +998,7 @@
       }
     }
 
-    // 7. Video Trimmer
+    // 8. Video Trimmer
     let loadedVideoBlob = null;
     function carregarVideoLocal(input) {
       if (!input.files || input.files.length === 0) return;
@@ -844,8 +1056,7 @@
         }, durationMs);
 
       } catch (err) {
-        // Fallback caso captureStream não seja suportado no browser
-        status.innerText = 'Exportação direta por gravação não suportada neste dispositivo. Baixando arquivo original...';
+        status.innerText = 'Gravação direta não suportada. Baixando arquivo original...';
         const a = document.createElement('a');
         a.href = URL.createObjectURL(loadedVideoBlob);
         a.download = loadedVideoBlob.name;
@@ -853,7 +1064,7 @@
       }
     }
 
-    // 8. Baixador de Vídeos
+    // 9. Baixador de Vídeos
     function abrirServicoDownload(servico) {
       triggerHaptic('impact');
       const link = document.getElementById('urlDownloader').value.trim();
@@ -868,7 +1079,7 @@
       if (tg) tg.openLink(targetUrl); else window.open(targetUrl, '_blank');
     }
 
-    // 9. QR Code
+    // 10. QR Code
     let html5QrcodeScanner = null;
     function switchSubQR(mode) {
       triggerHaptic('impact');
@@ -926,7 +1137,7 @@
       }
     }
 
-    // 10. Calculadora de Linha
+    // 11. Calculadora de Linha
     function inserirSimboloCalc(simbolo) {
       triggerHaptic('impact');
       const input = document.getElementById('expressaoCalc');
@@ -951,7 +1162,7 @@
       }
     }
 
-    // 11. Zip e Unzip
+    // 12. Zip e Unzip
     async function compactarArquivos() {
       triggerHaptic('impact');
       const input = document.getElementById('ficheirosParaZip');
