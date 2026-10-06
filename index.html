@@ -4,17 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Quick Tools</title>
-  <!-- SDK do Telegram Web App -->
+  <!-- Telegram Web App SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <!-- Biblioteca para Leitura de QR Code pela Câmera -->
+  <!-- Leitor de QR Code -->
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <!-- Calculadora matemática -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.1/math.js"></script>
+  <!-- Manipulador de ZIP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
     :root {
       --bg: var(--tg-theme-bg-color, #ffffff);
-      --text: var(--tg-theme-text-color, #000000);
-      --sec-bg: var(--tg-theme-secondary-bg-color, #f1f1f1);
+      --text: var(--tg-theme-text-color, #111111);
+      --sec-bg: var(--tg-theme-secondary-bg-color, #f3f4f6);
       --btn-bg: var(--tg-theme-button-color, #2481cc);
       --btn-text: var(--tg-theme-button-text-color, #ffffff);
+    }
+    * {
+      box-sizing: border-box;
     }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -24,41 +31,44 @@
       padding: 16px;
     }
     h1 {
-      font-size: 22px;
+      font-size: 20px;
       text-align: center;
-      margin-bottom: 5px;
+      margin: 0 0 4px 0;
     }
     p.welcome {
       text-align: center;
-      margin-top: 0;
-      font-size: 14px;
-      opacity: 0.8;
-      margin-bottom: 25px;
+      margin: 0 0 16px 0;
+      font-size: 13px;
+      opacity: 0.75;
     }
-    /* Abas */
-    .tabs {
-      display: flex;
-      justify-content: space-around;
+    /* Barra de rolagem horizontal das Abas */
+    .tabs-wrapper {
+      overflow-x: auto;
+      white-space: nowrap;
+      margin-bottom: 16px;
       border-bottom: 2px solid var(--sec-bg);
-      margin-bottom: 20px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .tabs-wrapper::-webkit-scrollbar {
+      display: none;
     }
     .tab-btn {
       background: none;
       border: none;
-      padding: 10px 15px;
+      display: inline-block;
+      padding: 10px 14px;
       color: var(--text);
-      font-weight: bold;
+      font-weight: 600;
       font-size: 14px;
       cursor: pointer;
       opacity: 0.6;
       border-bottom: 3px solid transparent;
-      transition: all 0.3s;
+      transition: all 0.2s ease;
     }
     .tab-btn.active {
       opacity: 1;
       border-bottom: 3px solid var(--btn-bg);
     }
-    /* Conteúdo das Abas */
     .tab-content {
       display: none;
     }
@@ -67,171 +77,279 @@
     }
     .card {
       background: var(--sec-bg);
-      border-radius: 14px;
-      padding: 18px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
     }
     label {
-      font-weight: bold;
-      font-size: 14px;
+      font-weight: 600;
+      font-size: 13px;
       display: block;
       margin-bottom: 6px;
     }
-    input {
+    input[type="text"], input[type="tel"], input[type="url"], input[type="file"] {
       width: 100%;
-      padding: 12px;
+      padding: 11px;
       border-radius: 8px;
       border: 1px solid #ccc;
-      box-sizing: border-box;
-      font-size: 16px;
-      margin-bottom: 15px;
+      font-size: 15px;
+      margin-bottom: 12px;
+      background: #ffffff;
+      color: #000000;
     }
-    button {
+    button.action-btn {
       background-color: var(--btn-bg);
       color: var(--btn-text);
       border: none;
       padding: 12px;
       border-radius: 8px;
-      font-weight: bold;
-      font-size: 16px;
+      font-weight: 600;
+      font-size: 15px;
       cursor: pointer;
       width: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 8px;
-    }
-    button:active {
-      opacity: 0.9;
-    }
-    .result-box {
-      background: rgba(0,0,0,0.03);
-      border: 1px dashed #ccc;
-      padding: 12px;
-      border-radius: 8px;
-      margin-top: 15px;
-      word-break: break-all;
       text-align: center;
-      font-size: 15px;
     }
-    .qr-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+    button.action-btn:active {
+      opacity: 0.85;
+    }
+    .grid-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 10px;
     }
-    #reader {
-      width: 100%;
-      background: #000;
+    .grid-buttons button {
+      background: var(--btn-bg);
+      color: var(--btn-text);
+      border: none;
+      padding: 11px;
       border-radius: 8px;
-      overflow: hidden;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .result-box {
+      background: rgba(0, 0, 0, 0.04);
+      border: 1px dashed #bbb;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 14px;
+      word-break: break-all;
+      text-align: center;
+      font-size: 14px;
     }
     .sub-tabs {
       display: flex;
-      gap: 10px;
-      margin-bottom: 15px;
+      gap: 8px;
+      margin-bottom: 12px;
     }
     .sub-tabs button {
-      font-size: 13px;
+      flex: 1;
       padding: 8px;
-    }
-    .sub-tabs .inactive {
-      background-color: transparent;
+      border-radius: 6px;
       border: 1px solid var(--btn-bg);
+      background: var(--btn-bg);
+      color: var(--btn-text);
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .sub-tabs button.inactive {
+      background: transparent;
       color: var(--btn-bg);
+    }
+    #reader {
+      width: 100%;
+      background: #000000;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    ul.file-list {
+      text-align: left;
+      margin: 8px 0 0 0;
+      padding-left: 20px;
+      font-size: 13px;
     }
   </style>
 </head>
 <body>
 
-  <h1>🛠️ Utility Tools</h1>
+  <h1>🛠️ Quick Tools</h1>
   <p class="welcome" id="boasVindas">Bem-vindo!</p>
 
   <!-- Abas de Navegação -->
-  <div class="tabs">
+  <div class="tabs-wrapper">
     <button class="tab-btn active" onclick="switchTab('tab-whats', this)">💬 WhatsApp</button>
+    <button class="tab-btn" onclick="switchTab('tab-busca', this)">🔍 Buscas</button>
     <button class="tab-btn" onclick="switchTab('tab-links', this)">🔗 Links</button>
     <button class="tab-btn" onclick="switchTab('tab-qr', this)">🔳 QR Code</button>
+    <button class="tab-btn" onclick="switchTab('tab-calc', this)">🔢 Calculadora</button>
+    <button class="tab-btn" onclick="switchTab('tab-zip', this)">📦 Zip / Unzip</button>
   </div>
 
-  <!-- ABA 1: WhatsApp -->
+  <!-- 1. WHATSAPP DIRETO -->
   <div id="tab-whats" class="tab-content active">
     <div class="card">
-      <label for="numWhats">Número de Celular com DDD:</label>
+      <label for="numWhats">Número de celular com DDD:</label>
       <input type="tel" id="numWhats" placeholder="Ex: 11999999999" oninput="formatarNum(this)">
-      <button onclick="gerarWhats()">💬 Abrir Conversa Direta</button>
+      <button class="action-btn" onclick="gerarWhats()">💬 Abrir Conversa Direta</button>
     </div>
   </div>
 
-  <!-- ABA 2: Encurtar Link -->
+  <!-- 2. BUSCAS GERAIS E LOJAS -->
+  <div id="tab-busca" class="tab-content">
+    <div class="card">
+      <label for="termoBusca">Digite o termo ou produto procurado:</label>
+      <input type="text" id="termoBusca" placeholder="Ex: fone bluetooth sem fio">
+      <div class="grid-buttons">
+        <button onclick="buscar('google')">🌐 Google</button>
+        <button onclick="buscar('ml')">🟡 Mercado Livre</button>
+        <button onclick="buscar('amazon')">📦 Amazon</button>
+        <button onclick="buscar('shein')">👗 Shein</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. ENCURTAR LINK -->
   <div id="tab-links" class="tab-content">
     <div class="card">
-      <label for="linkOriginal">Cole o link longo aqui:</label>
+      <label for="linkOriginal">Cole a URL longa que deseja encurtar:</label>
       <input type="url" id="linkOriginal" placeholder="https://exemplo.com/pagina-muito-longa">
-      <button onclick="encurtarLink()">⚡ Encurtar Link</button>
+      <button class="action-btn" onclick="encurtarLink()">⚡ Encurtar Link</button>
       
       <div id="boxLinkResult" class="result-box" style="display: none;">
         <span id="linkEncurtado"></span>
-        <button onclick="copiarLink()" style="margin-top: 8px; padding: 6px; font-size: 13px; background: #28a745;">📋 Copiar Link</button>
+        <button class="action-btn" onclick="copiarLink()" style="margin-top: 10px; padding: 8px; font-size: 13px; background: #28a745;">📋 Copiar Link</button>
       </div>
     </div>
   </div>
 
-  <!-- ABA 3: QR Code (Gerar & Ler) -->
+  <!-- 4. QR CODE (GERAR / LER) -->
   <div id="tab-qr" class="tab-content">
     <div class="sub-tabs">
-      <button id="btnSubGerar" class="" onclick="switchSubQR('gerar')">🎨 Criar QR</button>
+      <button id="btnSubGerar" onclick="switchSubQR('gerar')">🎨 Criar QR</button>
       <button id="btnSubLer" class="inactive" onclick="switchSubQR('ler')">📷 Ler com Câmera</button>
     </div>
 
-    <!-- Gerar QR Code -->
+    <!-- Criar QR Code -->
     <div id="sub-qr-gerar" class="card">
-      <label for="textoQr">Texto, link ou Pix para o QR Code:</label>
-      <input type="text" id="textoQr" placeholder="Digite aqui o que quiser codificar...">
-      <button onclick="gerarQr()">🔳 Gerar QR Code</button>
+      <label for="textoQr">Texto, link ou código Pix:</label>
+      <input type="text" id="textoQr" placeholder="Digite para codificar...">
+      <button class="action-btn" onclick="gerarQr()">🔳 Gerar Código</button>
       
-      <div id="boxQrResult" class="qr-container" style="display: none; margin-top: 15px;">
-        <img id="imgQr" src="" alt="QR Code" style="border: 4px solid white; border-radius: 8px; max-width: 150px;">
-        <span style="font-size: 12px; opacity: 0.7;">Tire print ou escaneie o código acima!</span>
+      <div id="boxQrResult" style="display: none; text-align: center; margin-top: 14px;">
+        <img id="imgQr" src="" alt="QR Code" style="border: 4px solid white; border-radius: 8px; max-width: 170px;">
+        <p style="font-size: 12px; opacity: 0.7; margin-top: 6px;">Pronto para leitura ou captura de tela!</p>
       </div>
     </div>
 
-    <!-- Ler QR Code (Câmera) -->
+    <!-- Ler QR Code com Câmera -->
     <div id="sub-qr-ler" class="card" style="display: none;">
-      <label>Aponte a câmera para o QR Code:</label>
+      <label>Aponte a câmera para um QR Code:</label>
       <div id="reader"></div>
       <div id="scanned-result" class="result-box" style="display: none;">
-        <strong>Conteúdo lido:</strong><br>
-        <p id="scanned-text" style="font-size: 14px; margin: 8px 0;"></p>
-        <button id="btnAcessarLido" style="display: none; padding: 6px; font-size: 13px;">🔗 Acessar Link</button>
+        <strong>Conteúdo identificado:</strong>
+        <p id="scanned-text" style="margin: 8px 0; font-size: 13px;"></p>
+        <button id="btnAcessarLido" class="action-btn" style="display: none; padding: 8px; font-size: 13px;">🔗 Abrir Link</button>
       </div>
+    </div>
+  </div>
+
+  <!-- 5. CALCULADORA DE LINHA -->
+  <div id="tab-calc" class="tab-content">
+    <div class="card">
+      <label for="expressaoCalc">Expressão matemática em linha:</label>
+      <input type="text" id="expressaoCalc" placeholder="Ex: (45 * 12) + 350 / 2 - 15">
+      <button class="action-btn" onclick="calcularLinha()">🧮 Calcular</button>
+      <div id="resultadoCalc" class="result-box" style="display: none; font-weight: bold; font-size: 16px;"></div>
+    </div>
+  </div>
+
+  <!-- 6. ZIP / UNZIP -->
+  <div id="tab-zip" class="tab-content">
+    <div class="card" style="margin-bottom: 14px;">
+      <label>Compactar (Criar arquivo .ZIP):</label>
+      <input type="file" id="ficheirosParaZip" multiple>
+      <button class="action-btn" onclick="compactarArquivos()">📦 Baixar Arquivo .ZIP</button>
+    </div>
+
+    <div class="card">
+      <label>Descompactar (Ler arquivo .ZIP):</label>
+      <input type="file" id="ficheiroParaUnzip" accept=".zip">
+      <button class="action-btn" onclick="descompactarArquivo()" style="background: #555;">📂 Listar Conteúdo</button>
+      <div id="resultadoUnzip" class="result-box" style="display: none;"></div>
     </div>
   </div>
 
   <script>
-    // Inicializar SDK do Telegram
-    const tg = window.Telegram.WebApp;
-    tg.ready();
-    tg.expand(); // Abre no tamanho total da tela
-
-    // Tentar pegar o nome do usuário do Telegram
-    const user = tg.initDataUnsafe?.user;
-    if (user) {
-      document.getElementById('boasVindas').innerText = `Olá, ${user.first_name}! Escolha uma utilidade abaixo:`;
+    // Inicialização do SDK do Telegram
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+      const user = tg.initDataUnsafe?.user;
+      if (user) {
+        document.getElementById('boasVindas').innerText = `Olá, ${user.first_name}! Escolha uma ferramenta:`;
+      }
     }
 
-    // Função de navegação entre as Abas Principais
+    // Navegação de Abas Principais
     function switchTab(tabId, btn) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
       document.getElementById(tabId).classList.add('active');
       btn.classList.add('active');
-      
-      // Se mudar de aba, para a câmera se ela estiver ligada
       stopCamera();
     }
 
-    // Função de navegação entre sub-abas do QR Code
+    // 1. WhatsApp Direto
+    function formatarNum(input) {
+      input.value = input.value.replace(/\D/g, '').substring(0, 11);
+    }
+    function gerarWhats() {
+      const num = document.getElementById('numWhats').value;
+      if (num.length < 10) return alert('Digite o número com o DDD (ex: 11999999999).');
+      const url = `https://wa.me/55${num}`;
+      if (tg) tg.openLink(url); else window.open(url, '_blank');
+    }
+
+    // 2. Buscas em Lojas e Web
+    function buscar(destino) {
+      const termo = encodeURIComponent(document.getElementById('termoBusca').value.trim());
+      if (!termo) return alert('Digite algo para pesquisar!');
+      
+      let url = '';
+      if (destino === 'google') url = `https://www.google.com/search?q=${termo}`;
+      if (destino === 'ml') url = `https://lista.mercadolivre.com.br/${termo}`;
+      if (destino === 'amazon') url = `https://www.amazon.com.br/s?k=${termo}`;
+      if (destino === 'shein') url = `https://br.shein.com/pdsearch/${termo}`;
+      
+      if (tg) tg.openLink(url); else window.open(url, '_blank');
+    }
+
+    // 3. Encurtador de Link
+    async function encurtarLink() {
+      const urlOriginal = document.getElementById('linkOriginal').value.trim();
+      if (!urlOriginal) return alert('Insira a URL original.');
+
+      const box = document.getElementById('boxLinkResult');
+      const label = document.getElementById('linkEncurtado');
+      label.innerText = 'Encurtando...';
+      box.style.display = 'block';
+
+      try {
+        const res = await fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(urlOriginal)}`);
+        const data = await res.json();
+        label.innerText = data.shorturl || 'Erro ao encurtar.';
+      } catch (err) {
+        label.innerText = 'Erro de conexão ao encurtar.';
+      }
+    }
+    function copiarLink() {
+      const text = document.getElementById('linkEncurtado').innerText;
+      navigator.clipboard.writeText(text).then(() => alert('Link copiado com sucesso!'));
+    }
+
+    // 4. QR Code
     let html5QrcodeScanner = null;
     function switchSubQR(mode) {
       if (mode === 'gerar') {
@@ -248,116 +366,88 @@
         startCamera();
       }
     }
-
-    // --- FUNÇÕES DA FERRAMENTA 1: WHATSAPP ---
-    function formatarNum(input) {
-      // Remove tudo o que não for número e limita a 11 dígitos
-      let value = input.value.replace(/\D/g, '').substring(0, 11);
-      input.value = value;
-    }
-
-    function gerarWhats() {
-      const num = document.getElementById('numWhats').value;
-      if (num.length < 10) {
-        alert('Digite o número com o DDD (ex: 11999999999).');
-        return;
-      }
-      // Redireciona o usuário para abrir o chat do WhatsApp diretamente
-      tg.openLink(`https://wa.me/55${num}`);
-    }
-
-    // --- FUNÇÕES DA FERRAMENTA 2: ENCURTAR LINK ---
-    async function encurtarLink() {
-      const originalUrl = document.getElementById('linkOriginal').value.trim();
-      if (!originalUrl) {
-        alert('Por favor, insira o link.');
-        return;
-      }
-
-      const box = document.getElementById('boxLinkResult');
-      const text = document.getElementById('linkEncurtado');
-      text.innerText = "Encurtando...";
-      box.style.display = 'block';
-
-      try {
-        // Envia para a API is.gd
-        const res = await fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(originalUrl)}`);
-        const data = await res.json();
-        
-        if (data.shorturl) {
-          text.innerText = data.shorturl;
-        } else {
-          text.innerText = "Erro ao encurtar o link.";
-        }
-      } catch (err) {
-        text.innerText = "Erro de conexão, tente novamente.";
-      }
-    }
-
-    function copiarLink() {
-      const text = document.getElementById('linkEncurtado').innerText;
-      navigator.clipboard.writeText(text).then(() => {
-        alert('Copiado para a área de transferência! 👍');
-      });
-    }
-
-    // --- FUNÇÕES DA FERRAMENTA 3: QR CODE ---
     function gerarQr() {
       const val = document.getElementById('textoQr').value.trim();
-      if (!val) {
-        alert('Digite algum texto, Pix ou link.');
-        return;
-      }
-      
-      const img = document.getElementById('imgQr');
-      const box = document.getElementById('boxQrResult');
-      
-      img.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(val)}`;
-      box.style.display = 'flex';
+      if (!val) return alert('Preencha com texto ou link.');
+      document.getElementById('imgQr').src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(val)}`;
+      document.getElementById('boxQrResult').style.display = 'block';
     }
-
-    // Inicializar Câmera e Leitura de QR Code
     function startCamera() {
       document.getElementById('scanned-result').style.display = 'none';
-      
       html5QrcodeScanner = new Html5Qrcode("reader");
-      
-      const config = { fps: 10, qrbox: { width: 200, height: 200 } };
-      
       html5QrcodeScanner.start(
-        { facingMode: "environment" }, // Prioriza câmera de trás do celular
-        config,
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 220, height: 220 } },
         onScanSuccess
-      ).catch(err => {
-        console.error("Erro ao iniciar câmera", err);
-        alert("Não foi possível acessar a câmera do celular. Verifique as permissões.");
-      });
+      ).catch(() => alert('Permissão de câmera não concedida ou erro ao carregar sensor.'));
     }
-
-    function onScanSuccess(decodedText, decodedResult) {
+    function onScanSuccess(decodedText) {
       stopCamera();
-      
-      const resBox = document.getElementById('scanned-result');
-      const resText = document.getElementById('scanned-text');
+      document.getElementById('scanned-text').innerText = decodedText;
+      document.getElementById('scanned-result').style.display = 'block';
       const btnLink = document.getElementById('btnAcessarLido');
-      
-      resText.innerText = decodedText;
-      resBox.style.display = 'block';
-
-      // Se for link, mostra botão para acessar
       if (decodedText.startsWith('http://') || decodedText.startsWith('https://')) {
         btnLink.style.display = 'block';
-        btnLink.onclick = () => tg.openLink(decodedText);
+        btnLink.onclick = () => { if (tg) tg.openLink(decodedText); else window.open(decodedText, '_blank'); };
       } else {
         btnLink.style.display = 'none';
       }
     }
-
     function stopCamera() {
       if (html5QrcodeScanner) {
-        html5QrcodeScanner.stop().then(() => {
-          html5QrcodeScanner = null;
-        }).catch(err => console.log("Erro ao desligar câmera", err));
+        html5QrcodeScanner.stop().then(() => { html5QrcodeScanner = null; }).catch(() => {});
+      }
+    }
+
+    // 5. Calculadora de Linha
+    function calcularLinha() {
+      const exp = document.getElementById('expressaoCalc').value.trim();
+      const box = document.getElementById('resultadoCalc');
+      if (!exp) return alert('Digite a conta.');
+      try {
+        const resultado = math.evaluate(exp);
+        box.innerText = `Resultado: ${resultado}`;
+        box.style.display = 'block';
+      } catch (err) {
+        box.innerText = 'Expressão inválida. Verifique os operadores.';
+        box.style.display = 'block';
+      }
+    }
+
+    // 6. Zip e Unzip
+    async function compactarArquivos() {
+      const input = document.getElementById('ficheirosParaZip');
+      if (input.files.length === 0) return alert('Selecione arquivos para compactar.');
+      
+      const zip = new JSZip();
+      for (let i = 0; i < input.files.length; i++) {
+        zip.file(input.files[i].name, input.files[i]);
+      }
+      
+      const blob = await zip.generateAsync({ type: 'blob' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'arquivos_compactados.zip';
+      a.click();
+    }
+
+    async function descompactarArquivo() {
+      const input = document.getElementById('ficheiroParaUnzip');
+      const box = document.getElementById('resultadoUnzip');
+      if (input.files.length === 0) return alert('Selecione um arquivo .zip primeiro.');
+
+      try {
+        const zip = await JSZip.loadAsync(input.files[0]);
+        let nomes = '<ul class="file-list">';
+        zip.forEach((relativePath) => {
+          nomes += `<li>📄 ${relativePath}</li>`;
+        });
+        nomes += '</ul>';
+        box.innerHTML = `<strong>Arquivos contidos no ZIP:</strong>${nomes}`;
+        box.style.display = 'block';
+      } catch (err) {
+        box.innerText = 'Não foi possível ler o arquivo selecionado como ZIP.';
+        box.style.display = 'block';
       }
     }
   </script>
