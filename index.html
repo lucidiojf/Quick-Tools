@@ -75,7 +75,7 @@
       background: #ffffff;
       color: #000000;
     }
-    textarea { min-height: 90px; resize: vertical; }
+    textarea { min-height: 80px; resize: vertical; }
 
     button.action-btn {
       background-color: var(--btn-bg);
@@ -145,7 +145,7 @@
     </div>
   </div>
 
-  <!-- 2. BUSCAS -->
+  <!-- 2. BUSCAS (8 PLATAFORMAS) -->
   <div id="tab-busca" class="tab-content">
     <div class="card">
       <label for="termoBusca">Digite o termo ou produto:</label>
@@ -155,6 +155,10 @@
         <button type="button" class="btn-busca" data-dest="ml">🟡 Mercado Livre</button>
         <button type="button" class="btn-busca" data-dest="amazon">📦 Amazon</button>
         <button type="button" class="btn-busca" data-dest="shein">👗 Shein</button>
+        <button type="button" class="btn-busca" data-dest="magalu">💙 Magalu</button>
+        <button type="button" class="btn-busca" data-dest="ali">🔴 AliExpress</button>
+        <button type="button" class="btn-busca" data-dest="bahia">🔵 Casas Bahia</button>
+        <button type="button" class="btn-busca" data-dest="americanas">🔴 Americanas</button>
       </div>
     </div>
   </div>
@@ -172,14 +176,30 @@
     </div>
   </div>
 
-  <!-- 4. QR CODE -->
+  <!-- 4. QR CODE (GERAR E LER DA GALERIA) -->
   <div id="tab-qr" class="tab-content">
     <div class="card">
-      <label for="textoQr">Texto, Link ou Pix Copia e Cola:</label>
-      <input type="text" id="textoQr" placeholder="Digite para gerar o QR...">
+      <label for="textoQr">🎨 Criar QR Code:</label>
+      <input type="text" id="textoQr" placeholder="Digite link, texto ou Pix...">
       <button type="button" class="action-btn" id="btnGerarQr">🔳 Gerar QR Code</button>
       <div id="boxQrResult" style="display: none; text-align: center; margin-top: 14px;">
         <img id="imgQr" src="" alt="QR Code" style="border: 4px solid white; border-radius: 8px; max-width: 180px;">
+      </div>
+    </div>
+
+    <div class="card">
+      <label for="qrFotoInput">🖼️ Ler QR Code da Galeria / Imagem:</label>
+      <p style="font-size: 12px; color: var(--hint); margin: 0 0 10px 0;">Escolha uma captura de ecrã ou fotografia que contenha um QR Code:</p>
+      <input type="file" id="qrFotoInput" accept="image/*">
+      <button type="button" class="action-btn" id="btnLerQrFoto" style="background: #28a745;">🔍 Ler QR Code da Imagem</button>
+
+      <div id="boxQrLido" class="result-box" style="display: none;">
+        <strong>Conteúdo Identificado:</strong>
+        <p id="textoQrLido" style="margin: 8px 0; font-size: 13px; font-weight: bold;"></p>
+        <div style="display: flex; gap: 8px; margin-top: 10px;">
+          <button type="button" class="action-btn" id="btnCopiarQrLido" style="padding: 8px; font-size: 13px;">📋 Copiar</button>
+          <button type="button" class="action-btn" id="btnAbrirLinkQr" style="padding: 8px; font-size: 13px; display: none; background: #007bff;">🔗 Abrir Link</button>
+        </div>
       </div>
     </div>
   </div>
@@ -192,7 +212,7 @@
       <p id="statusGravador" style="font-size: 12px; color: var(--hint); margin: 6px 0 10px 0; text-align: center;">Clique para falar via microfone.</p>
       
       <label for="textoTranscricao">Texto Transcrito:</label>
-      <textarea id="textoTranscricao" placeholder="O que você falar aparecerá aqui..."></textarea>
+      <textarea id="textoTranscricao" placeholder="O que falar aparecerá aqui..."></textarea>
       <button type="button" class="action-btn" id="btnCopiarTranscricao" style="padding: 10px; font-size: 13px; background: #28a745;">📋 Copiar Texto</button>
     </div>
   </div>
@@ -234,7 +254,7 @@
     </div>
 
     <div class="card">
-      <label>📥 Baixar Vídeos:</label>
+      <label>📥 Descarregar Vídeos:</label>
       <p style="font-size: 12px; color: var(--hint); margin: 0 0 10px 0;">Selecione a plataforma:</p>
       <div class="grid-buttons">
         <button type="button" class="btn-link-ext" data-url="https://sssinstagram.com/en1">📸 Instagram</button>
@@ -279,7 +299,7 @@
         }
       }
 
-      // NAVEGAÇÃO DE ABAS
+      // NAVEGAÇÃO DE SEPARADORES
       var tabBtns = document.querySelectorAll('.tab-btn');
       var tabContents = document.querySelectorAll('.tab-content');
 
@@ -310,21 +330,37 @@
       };
       document.getElementById('btnWhats').onclick = function() {
         var num = numWhats.value.trim();
-        if (num.length < 10) return alert('Digite o número com DDD.');
+        if (num.length < 10) return alert('Digite o número com o indicativo (DDD).');
         abrirLink('https://wa.me/55' + num);
       };
 
-      // 2. Buscas
+      // 2. Buscas (8 Lojas)
       var botoesBusca = document.querySelectorAll('.btn-busca');
       for (var b = 0; b < botoesBusca.length; b++) {
         botoesBusca[b].onclick = function() {
-          var termo = encodeURIComponent(document.getElementById('termoBusca').value.trim());
-          if (!termo) return alert('Digite algo para buscar!');
+          var termoRaw = document.getElementById('termoBusca').value.trim();
+          if (!termoRaw) return alert('Digite algo para pesquisar!');
+
+          var termo = encodeURIComponent(termoRaw);
           var dest = this.getAttribute('data-dest');
           var url = 'https://www.google.com/search?q=' + termo;
-          if (dest === 'ml') url = 'https://lista.mercadolivre.com.br/' + termo;
-          if (dest === 'amazon') url = 'https://www.amazon.com.br/s?k=' + termo;
-          if (dest === 'shein') url = 'https://br.shein.com/pdsearch/' + termo;
+
+          if (dest === 'ml') {
+            url = 'https://lista.mercadolivre.com.br/' + termo;
+          } else if (dest === 'amazon') {
+            url = 'https://www.amazon.com.br/s?k=' + termo;
+          } else if (dest === 'shein') {
+            url = 'https://br.shein.com/pdsearch/' + termo;
+          } else if (dest === 'magalu') {
+            url = 'https://www.magazineluiza.com.br/busca/' + termo + '/';
+          } else if (dest === 'ali') {
+            url = 'https://pt.aliexpress.com/w/wholesale-' + termo + '.html';
+          } else if (dest === 'bahia') {
+            url = 'https://www.casasbahia.com.br/' + termo + '/b';
+          } else if (dest === 'americanas') {
+            url = 'https://www.americanas.com.br/busca/' + termo;
+          }
+
           abrirLink(url);
         };
       }
@@ -336,26 +372,26 @@
         if (!urlOrig) return alert('Insira a URL.');
         var box = document.getElementById('boxLinkResult');
         var label = document.getElementById('linkEncurtado');
-        label.innerText = 'Encurtando...';
+        label.innerText = 'A encurtar...';
         box.style.display = 'block';
 
         fetch('https://is.gd/create.php?format=json&url=' + encodeURIComponent(urlOrig))
           .then(function(res) { return res.json(); })
           .then(function(data) {
-            label.innerText = data.shorturl || 'Erro ao encurtar.';
+            label.innerText = data.shorturl || 'Erro ao encurtar o endereço.';
           })
           .catch(function() {
-            label.innerText = 'Erro ao encurtar o link.';
+            label.innerText = 'Erro ao contactar o serviço de links.';
           });
       };
 
       document.getElementById('btnCopiarLink').onclick = function() {
         haptic();
         var t = document.getElementById('linkEncurtado').innerText;
-        navigator.clipboard.writeText(t).then(function() { alert('Link copiado!'); });
+        navigator.clipboard.writeText(t).then(function() { alert('Ligação copiada!'); });
       };
 
-      // 4. QR Code
+      // 4. QR Code (Criação e Leitura de Imagem)
       document.getElementById('btnGerarQr').onclick = function() {
         haptic();
         var val = document.getElementById('textoQr').value.trim();
@@ -364,7 +400,63 @@
         document.getElementById('boxQrResult').style.display = 'block';
       };
 
-      // 5. Voz para Texto (Sem repetição e contínuo)
+      document.getElementById('btnLerQrFoto').onclick = function() {
+        haptic();
+        var inputFoto = document.getElementById('qrFotoInput');
+        if (!inputFoto.files || inputFoto.files.length === 0) {
+          return alert('Selecione primeiro uma imagem da sua galeria.');
+        }
+
+        var file = inputFoto.files[0];
+        var boxLido = document.getElementById('boxQrLido');
+        var textoLido = document.getElementById('textoQrLido');
+        var btnAbrir = document.getElementById('btnAbrirLinkQr');
+
+        textoLido.innerText = 'A processar a imagem...';
+        btnAbrir.style.display = 'none';
+        boxLido.style.display = 'block';
+
+        var formData = new FormData();
+        formData.append('file', file);
+
+        fetch('https://api.qrserver.com/v1/read-qr-code/', {
+          method: 'POST',
+          body: formData
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(dados) {
+          if (dados && dados[0] && dados[0].symbol && dados[0].symbol[0]) {
+            var resultado = dados[0].symbol[0];
+            if (resultado.data) {
+              var valorDecodificado = resultado.data;
+              textoLido.innerText = valorDecodificado;
+
+              if (valorDecodificado.indexOf('http://') === 0 || valorDecodificado.indexOf('https://') === 0) {
+                btnAbrir.style.display = 'block';
+                btnAbrir.onclick = function() {
+                  abrirLink(valorDecodificado);
+                };
+              }
+            } else {
+              textoLido.innerText = 'Nenhum código QR legível foi encontrado nesta imagem.';
+            }
+          } else {
+            textoLido.innerText = 'Não foi possível ler o código QR.';
+          }
+        })
+        .catch(function() {
+          textoLido.innerText = 'Erro ao processar imagem. Experimente uma fotografia com melhor nitidez.';
+        });
+      };
+
+      document.getElementById('btnCopiarQrLido').onclick = function() {
+        haptic();
+        var txt = document.getElementById('textoQrLido').innerText;
+        if (!txt || txt.indexOf('Nenhum') === 0 || txt.indexOf('Erro') === 0) return alert('Nenhum dado válido para copiar.');
+        navigator.clipboard.writeText(txt).then(function() { alert('Conteúdo copiado!'); });
+      };
+
+      // 5. Voz para Texto
       var recognition = null;
       var gravando = false;
       var textoConsolidado = '';
@@ -423,7 +515,7 @@
             gravando = true;
             btnVoz.innerText = '⏹️ Parar Escuta';
             btnVoz.style.background = '#d9534f';
-            statusVoz.innerText = 'Ouvindo... Fale agora.';
+            statusVoz.innerText = 'A ouvir... Fale agora.';
           } catch(err) {
             statusVoz.innerText = 'Falha ao iniciar.';
           }
@@ -437,7 +529,7 @@
         haptic();
         var txt = campoTexto.value;
         if (!txt) return alert('Nenhum texto para copiar.');
-        navigator.clipboard.writeText(txt).then(function() { alert('Texto copiado!'); });
+        navigator.clipboard.writeText(txt).then(function() { alert('Texto copiado com sucesso!'); });
       };
 
       // 6. Tradutor
@@ -446,8 +538,8 @@
         var texto = document.getElementById('textoTraduzir').value.trim();
         var lang = document.getElementById('langTarget').value;
         var box = document.getElementById('resTraducao');
-        if (!texto) return alert('Digite o texto.');
-        box.innerText = 'Traduzindo...';
+        if (!texto) return alert('Digite o texto a traduzir.');
+        box.innerText = 'A traduzir...';
         box.style.display = 'block';
 
         fetch('https://api.mymemory.translated.net/get?q=' + encodeURIComponent(texto) + '&langpair=autodetect|' + lang)
@@ -456,7 +548,7 @@
             box.innerText = (data.responseData && data.responseData.translatedText) ? data.responseData.translatedText : 'Falha na tradução.';
           })
           .catch(function() {
-            box.innerText = 'Erro ao conectar ao tradutor.';
+            box.innerText = 'Erro ao contactar o serviço de tradução.';
           });
       };
 
@@ -465,7 +557,7 @@
         haptic();
         var exp = document.getElementById('expressaoCalc').value.trim();
         var box = document.getElementById('resultadoCalc');
-        if (!exp) return alert('Digite a conta.');
+        if (!exp) return alert('Digite o cálculo.');
         
         var expLimpa = exp.replace(/[^0-9+\-*/().]/g, '');
         if (!expLimpa) {
@@ -492,7 +584,7 @@
         };
       }
 
-    }); // Fechamento correto do window.onload
+    });
   </script>
 </body>
 </html>
