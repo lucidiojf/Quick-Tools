@@ -133,7 +133,7 @@
     <button type="button" class="tab-btn" data-target="tab-transcribe">🎙️ Voz p/ Texto</button>
     <button type="button" class="tab-btn" data-target="tab-translate">🌐 Tradutor</button>
     <button type="button" class="tab-btn" data-target="tab-calc">🔢 Calculadora</button>
-    <button type="button" class="tab-btn" data-target="tab-media">🎬 Vídeos</button>
+    <button type="button" class="tab-btn" data-target="tab-media">🎵 Músicas & Vídeos</button>
   </div>
 
   <!-- 1. WHATSAPP DIRETO -->
@@ -145,7 +145,7 @@
     </div>
   </div>
 
-  <!-- 2. BUSCAS (LOJAS E COMPARADORES) -->
+  <!-- 2. BUSCAS (11 PLATAFORMAS E COMPARADORES) -->
   <div id="tab-busca" class="tab-content">
     <div class="card">
       <label for="termoBusca">Digite o termo ou produto:</label>
@@ -179,7 +179,7 @@
     </div>
   </div>
 
-  <!-- 4. QR CODE -->
+  <!-- 4. QR CODE (GERAR E LER DA GALERIA) -->
   <div id="tab-qr" class="tab-content">
     <div class="card">
       <label for="textoQr">🎨 Criar QR Code:</label>
@@ -246,28 +246,42 @@
     </div>
   </div>
 
-  <!-- 8. VÍDEOS -->
+  <!-- 8. CENTRAL UNIFICADA DE MÚSICAS E VÍDEOS -->
   <div id="tab-media" class="tab-content">
+    <!-- Módulo 1: Pesquisa por Artista / Música -->
     <div class="card">
-      <label>🗜️ Comprimir Vídeo:</label>
-      <p style="font-size: 12px; color: var(--hint); margin: 0 0 10px 0;">Reduza o tamanho mantendo a qualidade:</p>
-      <button type="button" class="action-btn btn-link-ext" data-url="https://www.compress2go.com/compress-video">🗜️ Acessar Compress2Go</button>
-    </div>
-    <div class="card">
-      <label>📥 Baixar Vídeos:</label>
-      <p style="font-size: 12px; color: var(--hint); margin: 0 0 10px 0;">Selecione a plataforma:</p>
+      <label for="termoMusica">🎵 Pesquisar Música ou Artista:</label>
+      <input type="text" id="termoMusica" placeholder="Ex: Zé Cantor, Fagner, Zé Geraldo...">
+      <p style="font-size: 12px; color: var(--hint); margin: -4px 0 10px 0;">Ouvir e buscar direto na plataforma:</p>
       <div class="grid-buttons">
-        <button type="button" class="btn-link-ext" data-url="https://snapinsta.com.br/">📸 Instagram</button>
-        <button type="button" class="btn-link-ext" data-url="https://www.ytultra.com/pt/youtube-video-downloader/">▶️ YouTube</button>
+        <button type="button" class="btn-busca-musica" data-plataforma="youtube">▶️ YouTube Music</button>
+        <button type="button" class="btn-busca-musica" data-plataforma="spotify">🟢 Spotify</button>
+        <button type="button" class="btn-busca-musica" data-plataforma="suamusica">🟡 Sua Música</button>
+        <button type="button" class="btn-busca-musica" data-plataforma="soundcloud">🟠 SoundCloud</button>
       </div>
-      <div style="margin-top: 10px;">
-        <button type="button" class="action-btn btn-link-ext" style="background: #28a745;" data-url="https://www.savethevideo.com/pt/downloader">⚡ Universal (SaveTheVideo)</button>
+    </div>
+
+    <!-- Módulo 2: Baixar Vídeo ou Extrair MP3 via Cobalt / SaveTheVideo -->
+    <div class="card">
+      <label for="linkMidia">📥 Baixar de Link (Vídeo ou MP3):</label>
+      <input type="url" id="linkMidia" placeholder="Cole link do YouTube, Instagram, TikTok...">
+      <div class="grid-buttons">
+        <button type="button" id="btnBaixarCobalt" class="action-btn" style="background: #2481cc;">⚡ Extrair / Baixar</button>
+        <button type="button" class="action-btn btn-link-ext" data-url="https://www.compress2go.com/compress-video" style="background: #555;">🗜️ Comprimir</button>
+      </div>
+    </div>
+
+    <!-- Módulo 3: Portais Diretos Rápidos -->
+    <div class="card">
+      <label>🌐 Acesso Rápido:</label>
+      <div class="grid-buttons">
+        <button type="button" class="btn-link-ext" data-url="https://cobalt.tools">🚀 Cobalt Tools</button>
+        <button type="button" class="btn-link-ext" data-url="https://snapinsta.com.br/">📸 Instagram Downloader</button>
       </div>
     </div>
   </div>
 
   <script>
-    // Inicialização direta sem bloqueio
     (function() {
       var tg = null;
       try {
@@ -288,7 +302,6 @@
         } catch(e) {}
       }
 
-      // Função de abertura segura com fallbacks múltiplos
       function abrirLink(url) {
         haptic();
         try {
@@ -619,7 +632,37 @@
         });
       }
 
-      // 8. Links Externos
+      // 8. Músicas e Vídeos (Central Unificada)
+      var botoesMusica = document.querySelectorAll('.btn-busca-musica');
+      botoesMusica.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var inputMusica = document.getElementById('termoMusica');
+          var termo = inputMusica ? inputMusica.value.trim() : '';
+          if (!termo) return alert('Digite o nome da música ou cantor.');
+          var enc = encodeURIComponent(termo);
+          var plat = this.getAttribute('data-plataforma');
+          var url = '';
+
+          if (plat === 'youtube') url = 'https://music.youtube.com/search?q=' + enc;
+          if (plat === 'spotify') url = 'https://open.spotify.com/search/' + enc;
+          if (plat === 'suamusica') url = 'https://www.suamusica.com.br/busca/' + enc;
+          if (plat === 'soundcloud') url = 'https://soundcloud.com/search?q=' + enc;
+
+          abrirLink(url);
+        });
+      });
+
+      var btnCobalt = document.getElementById('btnBaixarCobalt');
+      if (btnCobalt) {
+        btnCobalt.addEventListener('click', function() {
+          var inputMidia = document.getElementById('linkMidia');
+          var link = inputMidia ? inputMidia.value.trim() : '';
+          if (!link) return alert('Cole primeiro o link do vídeo ou da música.');
+          abrirLink('https://cobalt.tools/?url=' + encodeURIComponent(link));
+        });
+      }
+
+      // Links Externos Gerais
       var linksExt = document.querySelectorAll('.btn-link-ext');
       linksExt.forEach(function(link) {
         link.addEventListener('click', function() {
