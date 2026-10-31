@@ -246,37 +246,40 @@
     </div>
   </div>
 
-  <!-- 8. CENTRAL UNIFICADA DE MÚSICAS E VÍDEOS -->
+ <!-- 8. CENTRAL DE MÚSICAS & DOWNLOAD DE VÍDEOS -->
   <div id="tab-media" class="tab-content">
-    <!-- Módulo 1: Pesquisa por Artista / Música -->
+    
+    <!-- Módulo 1: Pesquisa de Áudio/Streaming -->
     <div class="card">
-      <label for="termoMusica">🎵 Pesquisar Música ou Artista:</label>
+      <label for="termoMusica">🎵 Pesquisar Música ou Cantor:</label>
       <input type="text" id="termoMusica" placeholder="Ex: Zé Cantor, Fagner, Zé Geraldo...">
-      <p style="font-size: 12px; color: var(--hint); margin: -4px 0 10px 0;">Ouvir e buscar direto na plataforma:</p>
       <div class="grid-buttons">
         <button type="button" class="btn-busca-musica" data-plataforma="youtube">▶️ YouTube Music</button>
-        <button type="button" class="btn-busca-musica" data-plataforma="spotify">🟢 Spotify</button>
         <button type="button" class="btn-busca-musica" data-plataforma="suamusica">🟡 Sua Música</button>
+        <button type="button" class="btn-busca-musica" data-plataforma="spotify">🟢 Spotify</button>
         <button type="button" class="btn-busca-musica" data-plataforma="soundcloud">🟠 SoundCloud</button>
       </div>
     </div>
 
-    <!-- Módulo 2: Baixar Vídeo ou Extrair MP3 via Cobalt / SaveTheVideo -->
+    <!-- Módulo 2: Baixador por Link Composto (Vídeo & MP3) -->
     <div class="card">
-      <label for="linkMidia">📥 Baixar de Link (Vídeo ou MP3):</label>
-      <input type="url" id="linkMidia" placeholder="Cole link do YouTube, Instagram, TikTok...">
+      <label for="linkMidia">📥 Baixar Vídeo ou Áudio por Link:</label>
+      <input type="url" id="linkMidia" placeholder="Cole o link do YouTube, Instagram, TikTok, Reels...">
+      
       <div class="grid-buttons">
-        <button type="button" id="btnBaixarCobalt" class="action-btn" style="background: #2481cc;">⚡ Extrair / Baixar</button>
-        <button type="button" class="action-btn btn-link-ext" data-url="https://www.compress2go.com/compress-video" style="background: #555;">🗜️ Comprimir</button>
+        <button type="button" class="btn-down-link" data-servico="savethevideo" style="background: #28a745;">⚡ Baixar Tudo (SaveTheVideo)</button>
+        <button type="button" class="btn-down-link" data-servico="y2mate" style="background: #d9534f;">▶️ YouTube MP4 / MP3</button>
+        <button type="button" class="btn-down-link" data-servico="snapsave" style="background: #2481cc;">📸 Instagram / Reels</button>
+        <button type="button" class="action-btn btn-link-ext" data-url="https://www.compress2go.com/compress-video" style="background: #555;">🗜️ Comprimir Vídeo</button>
       </div>
     </div>
 
-    <!-- Módulo 3: Portais Diretos Rápidos -->
+    <!-- Módulo 3: Portais Diretos -->
     <div class="card">
-      <label>🌐 Acesso Rápido:</label>
+      <label>🌐 Acessar Portais Diretos:</label>
       <div class="grid-buttons">
-        <button type="button" class="btn-link-ext" data-url="https://cobalt.tools">🚀 Cobalt Tools</button>
-        <button type="button" class="btn-link-ext" data-url="https://snapinsta.com.br/">📸 Instagram Downloader</button>
+        <button type="button" class="btn-link-ext" data-url="https://www.savethevideo.com/pt/downloader">🌐 SaveTheVideo</button>
+        <button type="button" class="btn-link-ext" data-url="https://snapsave.app/pt">📲 SnapSave</button>
       </div>
     </div>
   </div>
