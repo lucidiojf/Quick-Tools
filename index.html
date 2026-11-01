@@ -249,35 +249,10 @@
     </div>
   </div>
 
-<!-- 8. CENTRAL DE MÚSICAS, VÍDEOS & PLAYLISTS -->
+<!-- 8. CENTRAL DE MÚSICAS, VÍDEOS & SOUNDHOUND -->
   <div id="tab-media" class="tab-content">
     
-    <!-- Módulo: Descarregar Playlist Completa (Spotify / Deezer / YouTube) -->
-    <div class="card">
-      <label for="linkPlaylist">📂 Descarregar Playlist ou Álbum Completo:</label>
-      <input type="url" id="linkPlaylist" placeholder="Cole o link da playlist (Spotify, Deezer ou YouTube)...">
-      <p style="font-size: 12px; color: var(--hint); margin: -4px 0 10px 0;">
-        Converte a lista completa em ficheiro .ZIP ou transfere todas as faixas:
-      </p>
-      <div class="grid-buttons">
-        <button type="button" class="btn-down-playlist" data-tipo="spotify" style="background: #1db954; color: #fff;">🟢 SpotifyDown (.ZIP)</button>
-        <button type="button" class="btn-down-playlist" data-tipo="spotdown" style="background: #2481cc; color: #fff;">🎧 SpotDown</button>
-      </div>
-    </div>
-
-    <!-- Módulo: Descarregar Vídeo ou Áudio Avulso por Link -->
-    <div class="card">
-      <label for="linkMidia">📥 Descarregar Faixa / Vídeo por Link:</label>
-      <input type="url" id="linkMidia" placeholder="Cole o link do YouTube, Instagram, TikTok, Reels...">
-      <div class="grid-buttons">
-        <button type="button" class="btn-down-link" data-servico="savethevideo" style="background: #28a745;">⚡ Descarregar Tudo (SaveTheVideo)</button>
-        <button type="button" class="btn-down-link" data-servico="y2mate" style="background: #d9534f;">▶️ YouTube MP4 / MP3</button>
-        <button type="button" class="btn-down-link" data-servico="snapsave" style="background: #2481cc;">📸 Instagram / Reels</button>
-        <button type="button" class="action-btn btn-link-ext" data-url="https://www.compress2go.com/compress-video" style="background: #555;">🗜️ Comprimir Vídeo</button>
-      </div>
-    </div>
-
-    <!-- Módulo: Pesquisa de Faixas / Artistas -->
+    <!-- Módulo 1: Pesquisa de Áudio e Bot Direto -->
     <div class="card">
       <label for="termoMusica">🎵 Pesquisar Artista / Música:</label>
       <input type="text" id="termoMusica" placeholder="Ex: Zé Cantor, Fagner, Zé Geraldo...">
@@ -287,7 +262,34 @@
         <button type="button" class="btn-busca-musica" data-plataforma="spotify">🟢 Spotify</button>
         <button type="button" class="btn-busca-musica" data-plataforma="soundcloud">🟠 SoundCloud</button>
       </div>
+      <!-- Botão Direto para o SoundHound Bot -->
+      <button type="button" class="action-btn btn-link-ext" data-url="https://t.me/SoundHound_Bot" style="background: #ff5c00; margin-top: 10px;">
+        🟠 Abrir SoundHound Bot no Telegram
+      </button>
     </div>
+
+    <!-- Módulo 2: Baixador por Link Composto -->
+    <div class="card">
+      <label for="linkMidia">📥 Baixar Vídeo ou Áudio por Link:</label>
+      <input type="url" id="linkMidia" placeholder="Cole o link do YouTube, Instagram, TikTok, Reels...">
+      <div class="grid-buttons">
+        <button type="button" class="btn-down-link" data-servico="savethevideo" style="background: #28a745;">⚡ Baixar Tudo (SaveTheVideo)</button>
+        <button type="button" class="btn-down-link" data-servico="y2mate" style="background: #d9534f;">▶️ YouTube MP4 / MP3</button>
+        <button type="button" class="btn-down-link" data-servico="snapsave" style="background: #2481cc;">📸 Instagram / Reels</button>
+        <button type="button" class="action-btn btn-link-ext" data-url="https://www.compress2go.com/compress-video" style="background: #555;">🗜️ Comprimir Vídeo</button>
+      </div>
+    </div>
+
+    <!-- Módulo 3: Portais Diretos -->
+    <div class="card">
+      <label>🌐 Acessar Portais Diretos:</label>
+      <div class="grid-buttons">
+        <button type="button" class="btn-link-ext" data-url="https://www.savethevideo.com/pt/downloader">🌐 SaveTheVideo</button>
+        <button type="button" class="btn-link-ext" data-url="https://snapsave.app/pt">📲 SnapSave</button>
+      </div>
+    </div>
+
+  </div>
 
   </div>
 
