@@ -240,6 +240,44 @@
         });
       });
     })();
+
+    // DESTRAVAR BOTÕES DE VÍDEO (Baixar Tudo, YouTube e Instagram)
+      var botoesDown = document.querySelectorAll('.btn-down-link');
+      botoesDown.forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          haptic();
+
+          var input = document.getElementById('linkMidia');
+          var link = input ? input.value.trim() : '';
+
+          if (!link) {
+            alert('Cole primeiro o link do vídeo no campo acima!');
+            return;
+          }
+
+          var servico = this.getAttribute('data-servico');
+          var enc = encodeURIComponent(link);
+          var destino = '';
+
+          // Copia o link para a área de transferência
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(link);
+          }
+
+          if (servico === 'savethevideo') {
+            destino = 'https://www.savethevideo.com/pt/downloader';
+          } else if (servico === 'y2mate') {
+            destino = 'https://www.y2mate.com/pt/search/' + enc;
+          } else if (servico === 'snapsave') {
+            destino = 'https://snapsave.app/pt';
+          }
+
+          if (destino) {
+            abrirLink(destino);
+          }
+        });
+      });
   </script>
 </body>
 </html>
